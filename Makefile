@@ -1,0 +1,28 @@
+it: 
+	g++ project2.cc lexer.cc inputbuf.cc CFG.cc
+
+test1:
+	make it 
+	./a.out < tests/test01.txt 1
+	rm ./a.out
+
+test2:
+	make it 
+	./a.out < tests/test01.txt 2
+	rm ./a.out
+
+
+fulltest:
+	make it 
+	bash test_01.sh	
+
+finaltest:
+	make it 
+	bash test_01.sh	
+
+clean:
+	rm ./a.out
+	rm program
+
+program: 
+	g++ -o program project2.cc lexer.cc inputbuf.cc CFG.cc
