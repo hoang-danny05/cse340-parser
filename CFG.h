@@ -9,8 +9,9 @@
 
 class Rule {
 public: 
-  Rule(LexicalAnalyzer*);
+  Rule(Token, std::vector<Token>);
   void Print();
+  bool isNull();
 
   Token LHS; 
   std::vector<Token> RHS;
