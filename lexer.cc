@@ -16,6 +16,7 @@ using namespace std;
 
 // Lexer modified for FIRST & FOLLOW project
 
+//                      0              1       2       3       4    5         6
 string reserved[] = { "END_OF_FILE", "ARROW", "STAR", "HASH", "ID", "ERROR", "OR" };
 
 void Token::Print()
@@ -121,11 +122,11 @@ Token LexicalAnalyzer::peek(int howFar)
         token.lexeme = "";
         token.line_no = line_no;
         token.token_type = END_OF_FILE;
-        cout << "Token peeked! Index[" << index << "] type=["<< reserved[token.token_type] <<"] lexeme=[" << token.lexeme << "].\n"; 
+        cout << "Token peeked! Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
         return token;
     } else {
         Token token = tokenList[peekIndex];
-        cout << "Token peeked! Index[" << index << "] type=["<< reserved[token.token_type] <<"] lexeme=[" << token.lexeme << "].\n"; 
+        cout << "Token peeked! Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
         return tokenList[peekIndex];
     }
 }

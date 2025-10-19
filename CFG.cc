@@ -10,10 +10,21 @@ ContextFreeGrammar::ContextFreeGrammar() {
 
   int count = 0;
 
-  while (lexer.peek(1).token_type != HASH && count <= 50) {
+  //Token peek = lexer.peek(1);
+
+  for (Token peek = lexer.peek(1);
+    (peek.token_type != END_OF_FILE) && (peek.token_type != HASH) && (count <= 50);)
+  {
+    std::cout << "STARTING NEW LOOP ASSHOLE\n";
+    std::cout << "Peek val: " << peek.token_type << std::endl;
+    std::cout << "Cond. val: " << ((peek.token_type != HASH) && (count <= 50)) << std::endl;
     Rule rule = Rule(&lexer);
     rules.push_back(rule);
     count++;
+
+    peek = lexer.peek(1);
+    std::cout << "peek val: " << peek.token_type << std::endl;
+    std::cout << "eqv val: " << ((peek.token_type != HASH) && (count <= 50)) << std::endl;
   }
 
   if (count == 50) {
