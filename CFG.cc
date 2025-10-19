@@ -3,6 +3,7 @@
 #include <cctype>
 #include <iostream>
 #include <cstring>
+#include <vector>
 
 
 ContextFreeGrammar::ContextFreeGrammar() {
@@ -92,17 +93,44 @@ void ContextFreeGrammar::initTokens() {
     return;
   }
 
+  std::vector<Token> nonterm_set;
+
   //nonterminals
   for (int i = 0; i < rules.size(); i++) {
     Rule rule = rules.at(i);
-    if (!vecContains(nonterminals, rule.LHS)) {
+    if (!vecContains(nonterm_set, rule.LHS)) {
+      nonterm_set.push_back(rule.LHS);
+    }
+  }
+
+  //nonterminals
+  for (int i = 0; i < rules.size(); i++) {
+    Rule rule = rules.at(i);
+
+    // if it is a nonterm, but not already in the order
+
+    if (
+      vecContains(nonterm_set, rule.LHS) && 
+      (!vecContains(nonterminals, rule.LHS))
+    ) {
       nonterminals.push_back(rule.LHS);
+    }
+
+    for (int j = 0; j < rule.RHS.size(); j++) {
+      if (
+        vecContains(nonterm_set, rule.RHS.at(j)) && 
+        (!vecContains(nonterminals, rule.RHS.at(j)))
+      ) {
+        nonterminals.push_back(rule.RHS.at(j));
+      }
     }
   }
 
   //terminals
   for (int i = 0; i < rules.size(); i++) {
     Rule rule = rules.at(i);
+
+
     for (int j = 0; j < rule.RHS.size(); j++) {
       if (
         (!vecContains(nonterminals, rule.RHS.at(j))) && 
@@ -174,10 +202,22 @@ void ContextFreeGrammar::initNullable() {
 
 void ContextFreeGrammar::PrintNullable() {
   std::cout << "Nullable = { ";
-  for (Token t : nullable) {
-    std::cout << t.lexeme << " ";
+  
+  int nullCount = 0;
+  for (Token order : nonterminals) {
+    for (Token t : nullable ) {
+      if (t.lexeme == order.lexeme) {
+        std::cout << t.lexeme;
+        //std::cout << "comp: " << nullCount << " == " << nullable.size() << "\n";
+        if (nullCount != nullable.size() -1)
+          std::cout << " , ";
+        nullCount +=1;
+        break;
+      }
+    }
   }
-  std::cout << "}\n";
+
+  std::cout << " }\n";
 }
 
 /////////////////////////////////////////////////////////////////////////

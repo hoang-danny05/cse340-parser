@@ -3,14 +3,13 @@ it:
 
 test1:
 	make it 
-	./a.out < tests/test01.txt 1
+	./a.out < tests/test05.txt 1
 	rm ./a.out
 
 test2:
 	make it 
-	./a.out < tests/test01.txt 2
+	./a.out < tests/test05.txt 2
 	rm ./a.out
-
 
 fulltest:
 	make it 
