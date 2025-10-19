@@ -25,13 +25,16 @@ public:
   ContextFreeGrammar();
   void Print();
   void PrintTokens();
+  void PrintNullable();
 
   std::vector<Rule> rules;
-  // std::vector<Token> tokens;
   std::vector<Token> nonterminals;
   std::vector<Token> terminals;
+
+  std::vector<Token> nullable;
 private:
   void initTokens();
+  void initNullable();
   bool vecContains(std::vector<Token>, Token);
 };
 

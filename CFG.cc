@@ -58,6 +58,7 @@ ContextFreeGrammar::ContextFreeGrammar() {
   }
 
   initTokens();
+  initNullable();
 }
 
 void ContextFreeGrammar::Print() {
@@ -69,6 +70,10 @@ void ContextFreeGrammar::Print() {
     rules.at(i).Print();
   }
 }
+
+/////////////////////////////////////////////////////////////////////////
+// PART 1: nonterminals and terminals
+/////////////////////////////////////////////////////////////////////////
 
 // checks lexeme, nothing else!
 bool ContextFreeGrammar::vecContains(std::vector<Token> vec, Token item) {
@@ -119,6 +124,66 @@ void ContextFreeGrammar::PrintTokens() {
   }
   std::cout << std::endl;
 }
+
+/////////////////////////////////////////////////////////////////////////
+// PART 2: NULLLABLE
+/////////////////////////////////////////////////////////////////////////
+
+void ContextFreeGrammar::initNullable() {
+  for (Rule rule : rules) { // i forgot foreach existed
+    if (rule.isNull() && (!vecContains(nullable, rule.LHS))) {
+      nullable.push_back(rule.LHS);
+    }
+    // else {
+    //   std::cout<< rule.LHS.lexeme << "is NOT null\n";
+    // }
+  }
+
+  int last_len = 0;
+  while (true) {
+    if (last_len == nullable.size()) {
+      break;
+    }
+    else {
+      last_len = nullable.size();
+    }
+
+    for (Rule rule : rules) {
+      // no duplicates
+      if(vecContains(nullable, rule.LHS)) {
+        continue;
+      }
+
+      bool isNull = true;
+      for (Token t : rule.RHS) {
+        if (vecContains(terminals, t)) { //actually not necessary but you never know
+          isNull = false;
+          break;
+        }
+        if(!vecContains(nullable, t)) {
+          isNull = false;
+          break;
+        }
+      }
+      if (isNull) {
+        nullable.push_back(rule.LHS);
+      }
+    }
+  }
+}
+
+void ContextFreeGrammar::PrintNullable() {
+  std::cout << "Nullable = { ";
+  for (Token t : nullable) {
+    std::cout << t.lexeme << " ";
+  }
+  std::cout << "}\n";
+}
+
+/////////////////////////////////////////////////////////////////////////
+// rule stuff
+/////////////////////////////////////////////////////////////////////////
+
 
 Rule::Rule(Token lhs, std::vector<Token> rhs) {
   LHS = lhs;

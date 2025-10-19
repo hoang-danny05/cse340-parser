@@ -37,6 +37,7 @@ void Task1()
 */
 void Task2()
 {
+  cfg.PrintNullable();
 }
 
 // Task 3: FIRST sets
