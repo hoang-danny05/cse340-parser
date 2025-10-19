@@ -21,11 +21,13 @@ private:
 
 // will have its own lexical analyzer
 class ContextFreeGrammar {
-  public:
-    ContextFreeGrammar();
-    void Print();
+public:
+  ContextFreeGrammar();
+  void Print();
+  void initTokens();
 
-    std::vector<Rule> rules;
+  std::vector<Rule> rules;
+  std::vector<Token> tokens;
 };
 
 #endif

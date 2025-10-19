@@ -15,7 +15,7 @@ ContextFreeGrammar cfg;
 
 // read grammar
 void ReadGrammar() {
-  cfg = ContextFreeGrammar();
+  // oh constructor is called automatically
   cfg.Print();
 
   cout << "Exited!! \n";

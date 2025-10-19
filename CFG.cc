@@ -6,7 +6,6 @@
 
 ContextFreeGrammar::ContextFreeGrammar() {
   LexicalAnalyzer lexer = LexicalAnalyzer();
-  //rules = std::vector<Rule>();
 
   int count = 0;
 
@@ -30,7 +29,7 @@ ContextFreeGrammar::ContextFreeGrammar() {
         std::cout << "\nAdding terminated rule\n";
         Rule rule = Rule(LHS, RHS);
         rule.Print();
-        rules.push_back(rule);
+        this->rules.push_back(rule);
         // std::cout << "Size:"<< rules.size()<< std::endl;
         break;
       }
@@ -38,7 +37,7 @@ ContextFreeGrammar::ContextFreeGrammar() {
         std::cout << "\nAdding OR rule\n";
         Rule rule = Rule(LHS, RHS);
         rule.Print();
-        rules.push_back(rule);
+        this->rules.push_back(rule);
         RHS = std::vector<Token>();
         //std::cout << "NEW RHS size:"<< RHS.size()<< std::endl;
       }
@@ -46,25 +45,24 @@ ContextFreeGrammar::ContextFreeGrammar() {
         RHS.push_back(tmp);
         // std::cout << "RHS size:"<< RHS.size()<< std::endl;
       }
-    }
+    } //end for each OR rule
     count++;
 
-    peek = lexer.peek(1);
-    // std::cout << "peek val: " << peek.token_type << std::endl;
-    // std::cout << "eqv val: " << ((peek.token_type != HASH) && (count <= 50)) << std::endl;
-  }
+   peek = lexer.peek(1);
+  } // end for each line
 
-  std::cout << "Final Size:"<< rules.size()<< std::endl;
+  std::cout << "Final Size:"<< this->rules.size()<< std::endl;
   if (count == 50) {
     std::cout << "WARNING: CFG rule limit exceeded!\n";
   }
 }
 
 void ContextFreeGrammar::Print() {
-  std::cout << "DISPLAYING CFG: \n";
   std::cout << "total rules: "<< rules.size() << "  \n";
+  std::cout << "###############################################\n";
+  std::cout << "DISPLAYING CFG: \n";
+  std::cout << "###############################################\n";
   for (int i = 0; i < rules.size(); i++) {
-    std::cout << "iter?\n";
     rules.at(i).Print();
   }
 }
