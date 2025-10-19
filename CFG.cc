@@ -2,6 +2,7 @@
 #include "lexer.h"
 #include <cctype>
 #include <iostream>
+#include <cstring>
 
 
 ContextFreeGrammar::ContextFreeGrammar() {
@@ -55,6 +56,8 @@ ContextFreeGrammar::ContextFreeGrammar() {
   if (count == 50) {
     std::cout << "WARNING: CFG rule limit exceeded!\n";
   }
+
+  initTokens();
 }
 
 void ContextFreeGrammar::Print() {
@@ -65,6 +68,56 @@ void ContextFreeGrammar::Print() {
   for (int i = 0; i < rules.size(); i++) {
     rules.at(i).Print();
   }
+}
+
+// checks lexeme, nothing else!
+bool ContextFreeGrammar::vecContains(std::vector<Token> vec, Token item) {
+  for(int i = 0; i < vec.size(); i++) {
+    if (vec.at(i).lexeme == item.lexeme)
+      return true;
+  }
+  return false;
+}
+
+void ContextFreeGrammar::initTokens() {
+  // must be called AFTER constructor
+  
+  if ((!terminals.empty()) || (!nonterminals.empty())) {
+    std::cout << "WARNING: initTokens called twice. returning\n";
+    return;
+  }
+
+  //nonterminals
+  for (int i = 0; i < rules.size(); i++) {
+    Rule rule = rules.at(i);
+    if (!vecContains(nonterminals, rule.LHS)) {
+      nonterminals.push_back(rule.LHS);
+    }
+  }
+
+  //terminals
+  for (int i = 0; i < rules.size(); i++) {
+    Rule rule = rules.at(i);
+    for (int j = 0; j < rule.RHS.size(); j++) {
+      if (
+        (!vecContains(nonterminals, rule.RHS.at(j))) && 
+        (!vecContains(terminals, rule.RHS.at(j)))
+      ) // if it is not a nonterm + not already in the list 
+      {
+        terminals.push_back(rule.RHS.at(j));
+      }
+    }
+  }
+}
+
+void ContextFreeGrammar::PrintTokens() {
+  for (int i = 0; i < terminals.size(); i++) {
+    std::cout << terminals.at(i).lexeme << " ";
+  }
+  for (int i = 0; i < nonterminals.size(); i++) {
+    std::cout << nonterminals.at(i).lexeme << " ";
+  }
+  std::cout << std::endl;
 }
 
 Rule::Rule(Token lhs, std::vector<Token> rhs) {

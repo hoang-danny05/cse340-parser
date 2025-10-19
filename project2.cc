@@ -28,6 +28,7 @@ void ReadGrammar() {
 */
 void Task1()
 {
+  cfg.PrintTokens();
 }
 
 /*

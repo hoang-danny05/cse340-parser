@@ -24,10 +24,15 @@ class ContextFreeGrammar {
 public:
   ContextFreeGrammar();
   void Print();
-  void initTokens();
+  void PrintTokens();
 
   std::vector<Rule> rules;
-  std::vector<Token> tokens;
+  // std::vector<Token> tokens;
+  std::vector<Token> nonterminals;
+  std::vector<Token> terminals;
+private:
+  void initTokens();
+  bool vecContains(std::vector<Token>, Token);
 };
 
 #endif
