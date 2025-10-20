@@ -46,6 +46,7 @@ private:
   void initFirst();
   void initFollow();
   bool vecContains(std::vector<Token>, Token);
+  int vecAddTo(std::vector<Token>*, std::vector<Token>*);
 };
 
 #endif

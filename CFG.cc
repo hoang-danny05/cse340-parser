@@ -66,7 +66,7 @@ ContextFreeGrammar::ContextFreeGrammar() {
   initTokens();
   initNullable();
   initFirst();
-  initFollow();
+  //initFollow();
 }
 
 void ContextFreeGrammar::Print() {
@@ -231,7 +231,32 @@ void ContextFreeGrammar::PrintNullable() {
 // PART 3: FIRST SETS
 /////////////////////////////////////////////////////////////////////////
 
+//NOTE: USE THIS AS SET ADDITION, NOTHING ELSE
+// returns changesMade
+int ContextFreeGrammar::vecAddTo(std::vector<Token>* from, std::vector<Token>* to) {
+  int changesMade = 0;
+
+  // for term in termsToAdd
+  for (Token term : *from) {
+    if (!vecContains(*to, term)) 
+    {
+      to->push_back(term);
+      //first.at(rule.LHS.lexeme).push_back(term);
+      changesMade++;
+    }
+  }
+
+  return changesMade;
+}
+
 void ContextFreeGrammar::initFirst() {
+  if (DEBUGGING)
+  std::cout << "Initialize map\n";
+  for (Token nonterm : nonterminals) {
+    first.insert({nonterm.lexeme, std::vector<Token>()});
+  }
+
+  if (DEBUGGING)
   std::cout << "Initial map terminals\n";
   for (Rule rule : rules) {
     // if RHS is not empty AND 
@@ -247,59 +272,106 @@ void ContextFreeGrammar::initFirst() {
     }
   }
 
+  if (DEBUGGING)
   std::cout << "Starting complex loop \n";
-  for (Rule rule : rules) {
+  while (true) {
     int changesMade = 0;
-    int nonTermNotNull = 0;
+    for (Rule rule : rules) {
 
-    //for each rule [rule]
-    //for each RHS char [r]
-    //if [r] is terminal 
-    //  add r to FIRST(rule.LHS)
-    //  break 
-    //if [rule] is nullable 
-    //  continue
-    //else 
-    //  nonTermNotNull += 1;
+      //for each rule [rule]
+      //for each RHS char [r]
+      //if [r] is terminal 
+      //  add r to FIRST(rule.LHS)
+      //  break 
+      //if [rule] is nullable 
+      //  continue
+      //else 
+      //  nonTermNotNull += 1;
 
-    for (Token r : rule.RHS) {
-      // if r is term AND 
-      // if r is not in first(LHS)
+      for (Token r : rule.RHS) {
+        // if r is term AND 
+        // if r is not in first(LHS)
 
-      if(
-        vecContains(terminals, r) && 
-        !vecContains(first.at(rule.LHS.lexeme), r)
-      )
-      {
-        first.at(rule.LHS.lexeme).push_back(r);
-        changesMade++;
-        break;
+        if(
+          vecContains(terminals, r)
+        )
+        {
+          if (DEBUGGING)
+            std::cout << "Terminal found: " << r.lexeme << "\n";
+
+          if (!vecContains(first.at(rule.LHS.lexeme), r)) {
+            first.at(rule.LHS.lexeme).push_back(r);
+            changesMade++;
+          }
+          break;
+        }
+        else if (vecContains(nullable, r))
+        {
+          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
+          if (DEBUGGING)
+            std::cout << "Nullable nonterm: " << r.lexeme << "\n";
+          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
+          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
+          changesMade += vecAddTo(termsToAdd, termsInSet);
+
+          continue;
+        }
+        else {
+          if (DEBUGGING)
+            std::cout << "Non-Nullable nonterm: " << r.lexeme << "\n";
+          // for (Token t: terminals) {
+          //   std::cout << t.lexeme << ", ";
+          // }
+          // std::cout << std::endl;
+          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
+          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
+          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
+          changesMade += vecAddTo(termsToAdd, termsInSet);
+          break;
+        }
+
       }
-      else if (vecContains(nullable, r))
-      {
-        continue;
-      }
-      else {
-        nonTermNotNull++;
-      }
 
-    }
 
+    } // end for(rules)
 
     if (changesMade == 0) {
-      if (nonTermNotNull != 0) {
-        std::cout<< "CFG:First: there was some nonTermNotNull action!\n";
-        std::exit(-1);
-      }
+      if (DEBUGGING)
+        std::cout<<"Ending FIRST Loops\n";
       break;
     }
-  }
+    else {
+      if (DEBUGGING)
+        std::cout<<"Next FIRST Loop\n";
+    }
+  } // end while
 }
 
 void ContextFreeGrammar::PrintFirst() {
 
-}
+  // for (lhs, terms) in first
+  for (Token tok : nonterminals){
+    std::string lhs = tok.lexeme;
+    std::vector<Token> terms = first.at(lhs);
+    std::cout << "FIRST(" << lhs << ") = { ";
 
+    int termCount = 0;
+    // in order of terminals
+    for(Token order : terminals) {
+      for(Token t : terms) {
+        if (t.lexeme == order.lexeme) {
+          std::cout << t.lexeme;
+          if (termCount != terms.size() - 1) {
+            std::cout << ", ";
+          }
+          termCount++;
+          break;
+        }
+      }
+    }
+    std::cout << " }\n";
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////
 // PART 4: FOLLOW SETS
