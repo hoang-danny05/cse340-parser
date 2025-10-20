@@ -66,7 +66,7 @@ ContextFreeGrammar::ContextFreeGrammar() {
   initTokens();
   initNullable();
   initFirst();
-  //initFollow();
+  initFollow();
 }
 
 void ContextFreeGrammar::Print() {
@@ -378,6 +378,157 @@ void ContextFreeGrammar::PrintFirst() {
 /////////////////////////////////////////////////////////////////////////
 
 void ContextFreeGrammar::initFollow() {
+  if (DEBUGGING)
+  std::cout << "follow: Initialize map\n";
+  for (Token nonterm : nonterminals) {
+    follow.insert({nonterm.lexeme, std::vector<Token>()});
+  }
+
+  Token eof;
+  eof.lexeme = "$";
+
+  //TODO: add eof to first nonterm
+
+  // if (DEBUGGING)
+  // std::cout << "Initial map terminals\n";
+  // for (Rule rule : rules) {
+  //   // if RHS is not empty AND 
+  //   // if the first character of the RHS terminal AND
+  //   // if the terminal is not already in the first set
+  //   if(
+  //     ((rule.RHS.size() > 0) && 
+  //     vecContains(terminals, rule.RHS.at(0))) &&
+  //     !vecContains(first.at(rule.LHS.lexeme), rule.RHS.at(0))
+  //   )
+  //   {
+  //     first.at(rule.LHS.lexeme).push_back(rule.RHS.at(0));
+  //   }
+  // }
+
+  if (DEBUGGING)
+  std::cout << "Starting complex loop \n";
+  while (true) {
+    int changesMade = 0;
+    for (Rule rule : rules) {
+      /*
+       * FOLLOW SET RULES 
+       *
+       * follow(s) has eof 
+       * A -> aBC 
+       *  - FIRST(C) in FOLLOW(B)
+       * A -> aB
+       *  - FOLLOW(A) in FOLLOW(B)
+       * A -> aBC 
+       *  - C in nullable 
+       *  - FOLLOW(A) in FOLLOW(B)
+      */
+
+      //for each rule [rule]
+      //for each RHS char r = RHS[i]
+      //if [r] is nonterminal 
+      //  null = true
+      //  while (not end of rule):
+      //
+      //    forwards
+      //    j = 1; i+j < size; j++
+      //    if (RHS[i+j] is terminal)
+      //      add RHS[i+j] to follow(r)
+      //      break
+      //    elif (RHS[i+j] is nullable)
+      //      add first(RHS[i+j]) to follow(r)
+      //      continue 
+      //    else (RHS[i+j] is non-null)
+      //      add first(RHS[i+j]) to follow(r)
+      //      break 
+      //
+      //  backwards, once per rule
+      //  k = size-1, k>0, k--; offset from r 
+      //    if (RHS[k] is nonterm, nullable):
+      //      add follow(LHS) to follow(RHS[k])
+      //      continue 
+      //    if (RHS[k] is nonterm, nonnull)
+      //      add follow(LHS) to follow(RHS[k])
+      //      break 
+      //    else terminal 
+      //      break
+
+      for (Token r : rule.RHS) {
+      //    forwards
+      //    j = 1; i+j < size; j++
+      //    if (RHS[i+j] is terminal)
+      //      add RHS[i+j] to follow(r)
+      //      break
+      //    elif (RHS[i+j] is nullable)
+      //      add first(RHS[i+j]) to follow(r)
+      //      continue 
+      //    else (RHS[i+j] is non-null)
+      //      add first(RHS[i+j]) to follow(r)
+      //      break 
+
+        if(
+          vecContains(terminals, r)
+        )
+        {
+          if (DEBUGGING)
+            std::cout << "Terminal found: " << r.lexeme << "\n";
+
+          if (!vecContains(first.at(rule.LHS.lexeme), r)) {
+            first.at(rule.LHS.lexeme).push_back(r);
+            changesMade++;
+          }
+          break;
+        }
+        else if (vecContains(nullable, r))
+        {
+          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
+          if (DEBUGGING)
+            std::cout << "Nullable nonterm: " << r.lexeme << "\n";
+          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
+          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
+          changesMade += vecAddTo(termsToAdd, termsInSet);
+
+          continue;
+        }
+        else {
+          if (DEBUGGING)
+            std::cout << "Non-Nullable nonterm: " << r.lexeme << "\n";
+          // for (Token t: terminals) {
+          //   std::cout << t.lexeme << ", ";
+          // }
+          // std::cout << std::endl;
+          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
+          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
+          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
+          changesMade += vecAddTo(termsToAdd, termsInSet);
+          break;
+        }
+
+      }
+
+      //TODO: add backwards traverse
+      //  backwards, once per rule
+      //  k = size-1, k>0, k--; offset from r 
+      //    if (RHS[k] is nonterm, nullable):
+      //      add follow(LHS) to follow(RHS[k])
+      //      continue 
+      //    if (RHS[k] is nonterm, nonnull)
+      //      add follow(LHS) to follow(RHS[k])
+      //      break 
+      //    else terminal 
+      //      break
+
+    } // end for(rules)
+
+    if (changesMade == 0) {
+      if (DEBUGGING)
+        std::cout<<"Ending FOLLOW Loops\n";
+      break;
+    }
+    else {
+      if (DEBUGGING)
+        std::cout<<"Next FOLLOW Loop\n";
+    }
+  } // end while
 
 }
 
