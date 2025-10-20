@@ -65,6 +65,8 @@ ContextFreeGrammar::ContextFreeGrammar() {
 
   initTokens();
   initNullable();
+  initFirst();
+  initFollow();
 }
 
 void ContextFreeGrammar::Print() {
@@ -223,6 +225,92 @@ void ContextFreeGrammar::PrintNullable() {
   }
 
   std::cout << " }\n";
+}
+
+/////////////////////////////////////////////////////////////////////////
+// PART 3: FIRST SETS
+/////////////////////////////////////////////////////////////////////////
+
+void ContextFreeGrammar::initFirst() {
+  std::cout << "Initial map terminals\n";
+  for (Rule rule : rules) {
+    // if RHS is not empty AND 
+    // if the first character of the RHS terminal AND
+    // if the terminal is not already in the first set
+    if(
+      ((rule.RHS.size() > 0) && 
+      vecContains(terminals, rule.RHS.at(0))) &&
+      !vecContains(first.at(rule.LHS.lexeme), rule.RHS.at(0))
+    )
+    {
+      first.at(rule.LHS.lexeme).push_back(rule.RHS.at(0));
+    }
+  }
+
+  std::cout << "Starting complex loop \n";
+  for (Rule rule : rules) {
+    int changesMade = 0;
+    int nonTermNotNull = 0;
+
+    //for each rule [rule]
+    //for each RHS char [r]
+    //if [r] is terminal 
+    //  add r to FIRST(rule.LHS)
+    //  break 
+    //if [rule] is nullable 
+    //  continue
+    //else 
+    //  nonTermNotNull += 1;
+
+    for (Token r : rule.RHS) {
+      // if r is term AND 
+      // if r is not in first(LHS)
+
+      if(
+        vecContains(terminals, r) && 
+        !vecContains(first.at(rule.LHS.lexeme), r)
+      )
+      {
+        first.at(rule.LHS.lexeme).push_back(r);
+        changesMade++;
+        break;
+      }
+      else if (vecContains(nullable, r))
+      {
+        continue;
+      }
+      else {
+        nonTermNotNull++;
+      }
+
+    }
+
+
+    if (changesMade == 0) {
+      if (nonTermNotNull != 0) {
+        std::cout<< "CFG:First: there was some nonTermNotNull action!\n";
+        std::exit(-1);
+      }
+      break;
+    }
+  }
+}
+
+void ContextFreeGrammar::PrintFirst() {
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+// PART 4: FOLLOW SETS
+/////////////////////////////////////////////////////////////////////////
+
+void ContextFreeGrammar::initFollow() {
+
+}
+
+void ContextFreeGrammar::PrintFollow() {
+
 }
 
 /////////////////////////////////////////////////////////////////////////

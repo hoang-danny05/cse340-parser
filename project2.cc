@@ -42,11 +42,13 @@ void Task2()
 // Task 3: FIRST sets
 void Task3()
 {
+  cfg.PrintFirst();
 }
 
 // Task 4: FOLLOW sets
 void Task4()
 {
+  cfg.PrintFollow();
 }
 
 // Task 5: left factoring

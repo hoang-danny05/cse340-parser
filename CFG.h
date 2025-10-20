@@ -5,9 +5,10 @@
 #include "lexer.h"
 #include <vector>
 #include <string>
+#include <map>
 
 
-static const bool DEBUGGING = false;
+static const bool DEBUGGING = true;
 
 class Rule {
 public: 
@@ -28,15 +29,22 @@ public:
   void Print();
   void PrintTokens();
   void PrintNullable();
+  void PrintFirst();
+  void PrintFollow();
 
   std::vector<Rule> rules;
   std::vector<Token> nonterminals;
   std::vector<Token> terminals;
 
   std::vector<Token> nullable;
+
+  std::map<std::string, std::vector<Token>> first;
+  std::map<std::string, std::vector<Token>> follow;
 private:
   void initTokens();
   void initNullable();
+  void initFirst();
+  void initFollow();
   bool vecContains(std::vector<Token>, Token);
 };
 
