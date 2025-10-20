@@ -7,6 +7,8 @@
 #include <string>
 
 
+static const bool DEBUGGING = false;
+
 class Rule {
 public: 
   Rule(Token, std::vector<Token>);

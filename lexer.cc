@@ -11,6 +11,7 @@
 
 #include "lexer.h"
 #include "inputbuf.h"
+#include "CFG.h"
 
 using namespace std;
 
@@ -103,7 +104,8 @@ Token LexicalAnalyzer::GetToken()
     else{
         token = tokenList[index];
         index = index + 1;
-        cout << "> got: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
+        if (DEBUGGING)
+          cout << "> got: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
     }
     return token;
 }
@@ -122,11 +124,13 @@ Token LexicalAnalyzer::peek(int howFar)
         token.lexeme = "";
         token.line_no = line_no;
         token.token_type = END_OF_FILE;
-        cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
+        if (DEBUGGING)
+          cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
         return token;
     } else {
         Token token = tokenList[peekIndex];
-        cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
+        if (DEBUGGING)
+          cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
         return tokenList[peekIndex];
     }
 }

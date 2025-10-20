@@ -28,17 +28,21 @@ ContextFreeGrammar::ContextFreeGrammar() {
       Token tmp = lexer.GetToken();
 
       if (tmp.token_type == STAR) {
-        std::cout << "\nAdding terminated rule\n";
         Rule rule = Rule(LHS, RHS);
-        rule.Print();
+        if (DEBUGGING) {
+          std::cout << "\nAdding terminated rule\n";
+          rule.Print();
+        }
         this->rules.push_back(rule);
         // std::cout << "Size:"<< rules.size()<< std::endl;
         break;
       }
       else if (tmp.token_type == OR) {
-        std::cout << "\nAdding OR rule\n";
         Rule rule = Rule(LHS, RHS);
-        rule.Print();
+        if (DEBUGGING) {
+          std::cout << "\nAdding OR rule\n";
+          rule.Print();
+        }
         this->rules.push_back(rule);
         RHS = std::vector<Token>();
         //std::cout << "NEW RHS size:"<< RHS.size()<< std::endl;
@@ -53,9 +57,10 @@ ContextFreeGrammar::ContextFreeGrammar() {
    peek = lexer.peek(1);
   } // end for each line
 
-  std::cout << "Final Size:"<< this->rules.size()<< std::endl;
+  if (DEBUGGING)
+    std::cout << "Final Size:"<< this->rules.size()<< std::endl;
   if (count == 50) {
-    std::cout << "WARNING: CFG rule limit exceeded!\n";
+   std::cout << "WARNING: CFG rule limit exceeded!\n";
   }
 
   initTokens();
