@@ -18,7 +18,7 @@ test3:
 
 test4:
 	make it 
-	./a.out < tests/test05.txt 4
+	./a.out < tests/test11.txt 4
 	rm ./a.out
 
 fulltest:

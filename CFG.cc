@@ -501,7 +501,7 @@ void ContextFreeGrammar::initFollow() {
       //      continue
 
       std::vector<Token> *inherit = &follow.at(rule.LHS.lexeme);
-      std::vector<Token> termsToAdd = {eof};
+      std::vector<Token> termsToAdd;
       // add follow(LHS)
       vecAddTo(inherit, &termsToAdd);
 
