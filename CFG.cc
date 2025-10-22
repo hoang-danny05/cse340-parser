@@ -6,10 +6,17 @@
 #include <vector>
 
 
-ContextFreeGrammar::ContextFreeGrammar() {
+// uhh 
+
+ContextFreeGrammar::ContextFreeGrammar() {};
+
+// read grammar
+
+void ContextFreeGrammar::readGrammar() {
   LexicalAnalyzer lexer = LexicalAnalyzer();
 
   int count = 0;
+  const int limit = 300;
 
   for (Token peek = lexer.peek(1);
     (peek.token_type != END_OF_FILE) && (peek.token_type != HASH) && (count <= 50);)
@@ -18,11 +25,11 @@ ContextFreeGrammar::ContextFreeGrammar() {
     std::vector<Token> RHS = std::vector<Token>();
     
     if (lexer.GetToken().token_type != ARROW) {
-      std::cout << "[CFG] Expected Arrow!\n";
+      std::cout << "SYNTAX ERROR !!!!!!!!!!!!!!\n";
     }
 
-    for (int i = 0; i < 50; i++) {
-      if (i == 50)
+    for (int i = 0; i < limit; i++) {
+      if (i == limit)
         std::cout << "[CFG] Exceeded rule length of tokens!!!\n";
       
       Token tmp = lexer.GetToken();
@@ -59,14 +66,9 @@ ContextFreeGrammar::ContextFreeGrammar() {
 
   if (DEBUGGING)
     std::cout << "Final Size:"<< this->rules.size()<< std::endl;
-  if (count == 50) {
+  if (count == limit) {
    std::cout << "WARNING: CFG rule limit exceeded!\n";
   }
-
-  initTokens();
-  initNullable();
-  initFirst();
-  initFollow();
 }
 
 void ContextFreeGrammar::Print() {
@@ -77,6 +79,15 @@ void ContextFreeGrammar::Print() {
   for (int i = 0; i < rules.size(); i++) {
     rules.at(i).Print();
   }
+}
+
+// initialize
+
+void ContextFreeGrammar::init() {
+  initTokens();
+  initNullable();
+  initFirst();
+  initFollow();
 }
 
 /////////////////////////////////////////////////////////////////////////

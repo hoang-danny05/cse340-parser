@@ -15,9 +15,10 @@ ContextFreeGrammar cfg;
 
 // read grammar
 void ReadGrammar() {
-  // oh constructor is called automatically
+  cfg.readGrammar();
   if (DEBUGGING)
     cfg.Print();
+  cfg.init();
 }
 
 /* 

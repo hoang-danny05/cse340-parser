@@ -26,6 +26,9 @@ private:
 class ContextFreeGrammar {
 public:
   ContextFreeGrammar();
+  void readGrammar();
+  void init();
+
   void Print();
   void PrintTokens();
   void PrintNullable();
