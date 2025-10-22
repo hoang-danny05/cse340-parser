@@ -8,7 +8,7 @@
 #include <map>
 
 
-static const bool DEBUGGING = true;
+static const bool DEBUGGING = false;
 
 class Rule {
 public: 

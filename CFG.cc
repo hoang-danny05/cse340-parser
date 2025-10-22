@@ -388,22 +388,56 @@ void ContextFreeGrammar::initFollow() {
   eof.lexeme = "$";
 
   //TODO: add eof to first nonterm
+  Token starter = nonterminals.at(0);
+  follow.at(starter.lexeme).push_back(eof);
 
-  // if (DEBUGGING)
-  // std::cout << "Initial map terminals\n";
-  // for (Rule rule : rules) {
-  //   // if RHS is not empty AND 
-  //   // if the first character of the RHS terminal AND
-  //   // if the terminal is not already in the first set
-  //   if(
-  //     ((rule.RHS.size() > 0) && 
-  //     vecContains(terminals, rule.RHS.at(0))) &&
-  //     !vecContains(first.at(rule.LHS.lexeme), rule.RHS.at(0))
-  //   )
-  //   {
-  //     first.at(rule.LHS.lexeme).push_back(rule.RHS.at(0));
-  //   }
-  // }
+
+  //    forwards
+  //    j = 1; i+j < size; j++
+  //    if (RHS[i+j] is terminal)
+  //      add RHS[i+j] to follow(r)
+  //      break
+  //    elif (RHS[i+j] is nullable)
+  //      add first(RHS[i+j]) to follow(r)
+  //      continue 
+  //    else (RHS[i+j] is non-null)
+  //      add first(RHS[i+j]) to follow(r)
+  //      break 
+  for (Rule rule : rules) {
+    for(int i = 0; i < rule.RHS.size(); i++) {
+      Token base = rule.RHS.at(i);
+      // don't need follow set of terminals 
+      if (vecContains(terminals, base)) {
+        continue;
+      }
+
+      // lives as long it is nullable
+      for(int j = i+1; j < rule.RHS.size(); j++) {
+        Token follower = rule.RHS.at(j);
+        if (vecContains(terminals, follower)) {
+          std::vector<Token> term = {follower};
+          std::vector<Token> *followTarget = &follow.at(base.lexeme);
+          vecAddTo(&term, followTarget);
+          break;
+        }
+        else if (vecContains(nullable, follower)) {
+          std::vector<Token> *terms = &first.at(follower.lexeme);
+          std::vector<Token> *followTarget = &follow.at(base.lexeme);
+          if (j == rule.RHS.size()) { // if it is the end
+            terms->push_back(eof);
+          } 
+          vecAddTo(terms, followTarget);
+          continue;
+        }
+        else { // NonNull Nonterm
+          std::vector<Token> *terms = &first.at(follower.lexeme);
+          std::vector<Token> *followTarget = &follow.at(base.lexeme);
+          vecAddTo(terms, followTarget);
+          break;
+        }
+      }
+    }
+  }
 
   if (DEBUGGING)
   std::cout << "Starting complex loop \n";
@@ -452,59 +486,6 @@ void ContextFreeGrammar::initFollow() {
       //    else terminal 
       //      break
 
-      for (Token r : rule.RHS) {
-      //    forwards
-      //    j = 1; i+j < size; j++
-      //    if (RHS[i+j] is terminal)
-      //      add RHS[i+j] to follow(r)
-      //      break
-      //    elif (RHS[i+j] is nullable)
-      //      add first(RHS[i+j]) to follow(r)
-      //      continue 
-      //    else (RHS[i+j] is non-null)
-      //      add first(RHS[i+j]) to follow(r)
-      //      break 
-
-        if(
-          vecContains(terminals, r)
-        )
-        {
-          if (DEBUGGING)
-            std::cout << "Terminal found: " << r.lexeme << "\n";
-
-          if (!vecContains(first.at(rule.LHS.lexeme), r)) {
-            first.at(rule.LHS.lexeme).push_back(r);
-            changesMade++;
-          }
-          break;
-        }
-        else if (vecContains(nullable, r))
-        {
-          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
-          if (DEBUGGING)
-            std::cout << "Nullable nonterm: " << r.lexeme << "\n";
-          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
-          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
-          changesMade += vecAddTo(termsToAdd, termsInSet);
-
-          continue;
-        }
-        else {
-          if (DEBUGGING)
-            std::cout << "Non-Nullable nonterm: " << r.lexeme << "\n";
-          // for (Token t: terminals) {
-          //   std::cout << t.lexeme << ", ";
-          // }
-          // std::cout << std::endl;
-          //NOTE: adds first[r.lexeme] to first[rule.LHS.lexeme]
-          std::vector<Token>* termsToAdd = &first.at(r.lexeme);
-          std::vector<Token>* termsInSet = &first.at(rule.LHS.lexeme);
-          changesMade += vecAddTo(termsToAdd, termsInSet);
-          break;
-        }
-
-      }
-
       //TODO: add backwards traverse
       //  backwards, once per rule
       //  k = size-1, k>0, k--; offset from r 
@@ -513,9 +494,51 @@ void ContextFreeGrammar::initFollow() {
       //      continue 
       //    if (RHS[k] is nonterm, nonnull)
       //      add follow(LHS) to follow(RHS[k])
-      //      break 
+      //      remove termsToAdd
+      //      continue
       //    else terminal 
-      //      break
+      //      remove termsToAdd
+      //      continue
+
+      std::vector<Token> *inherit = &follow.at(rule.LHS.lexeme);
+      std::vector<Token> termsToAdd = {eof};
+      // add follow(LHS)
+      vecAddTo(inherit, &termsToAdd);
+
+      for (int k = rule.RHS.size()-1; k >= 0; k--) {
+        Token current = rule.RHS.at(k);
+
+        if(vecContains(terminals, current)) { // ignore terminals
+          termsToAdd.clear();
+          termsToAdd.push_back(current);
+          continue;
+        }
+        else if (vecContains(nullable, current)) {
+          // add to follow(current)
+          std::vector<Token> *target = &follow.at(current.lexeme);
+          changesMade += vecAddTo(&termsToAdd, target);
+          
+          // add first(me) to collection
+          std::vector<Token> *newTarget = &first.at(current.lexeme);
+          vecAddTo(newTarget, &termsToAdd);
+
+          continue;
+        }
+        else { // nonterm nullable
+          // add to follow(current)
+          std::vector<Token> *target = &follow.at(current.lexeme);
+          changesMade += vecAddTo(&termsToAdd, target);
+
+          // because not nullable
+          termsToAdd.clear();
+
+          // add first(me) to collection
+          std::vector<Token> *newTarget = &first.at(current.lexeme);
+          vecAddTo(newTarget, &termsToAdd);
+
+          continue;
+        }
+      }
 
     } // end for(rules)
 
@@ -533,7 +556,35 @@ void ContextFreeGrammar::initFollow() {
 }
 
 void ContextFreeGrammar::PrintFollow() {
+  Token eof;
+  eof.lexeme = "$";
+  std::vector<Token> termOrder = { eof };
+  for (Token tok : terminals) {
+    termOrder.push_back(tok);
+  }
 
+  // for (lhs, terms) in first
+  for (Token tok : nonterminals){
+    std::string lhs = tok.lexeme;
+    std::vector<Token> terms = follow.at(lhs);
+    std::cout << "FOLLOW(" << lhs << ") = { ";
+
+    int termCount = 0;
+    // in order of terminals
+    for(Token order : termOrder) {
+      for(Token t : terms) {
+        if (t.lexeme == order.lexeme) {
+          std::cout << t.lexeme;
+          if (termCount != terms.size() - 1) {
+            std::cout << ", ";
+          }
+          termCount++;
+          break;
+        }
+      }
+    }
+    std::cout << " }\n";
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////
