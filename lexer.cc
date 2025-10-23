@@ -11,9 +11,10 @@
 
 #include "lexer.h"
 #include "inputbuf.h"
-#include "CFG.h"
 
 using namespace std;
+
+bool DEBUGGING = false;
 
 // Lexer modified for FIRST & FOLLOW project
 
