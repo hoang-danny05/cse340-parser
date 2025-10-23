@@ -54,6 +54,14 @@ public:
     return (other->RHS.size() < this->RHS.size());
   }
 
+  void cutBeginning(int cutLength) {
+    std::vector<Token> newRHS;
+    for (int i = cutLength-1; i < RHS.size(); i++) {
+      newRHS.push_back(RHS[i]);
+    }
+    RHS = newRHS;
+  }
+
 private:
   Token tmp;
 };
@@ -698,7 +706,7 @@ std::vector<Rule> ContextFreeGrammar::getRulesWith(Token lhs) {
   std::vector<Rule> ret;
 
   for (Rule rule : rules) {
-    if (rule.LHS.lexeme == lhs.lexeme) {
+    if (rule.LHS == lhs) {
       ret.push_back(rule);
     }
   }
@@ -712,7 +720,7 @@ std::vector<Rule> ContextFreeGrammar::popRulesWith(Token lhs) {
   std::vector<Rule> newRules;
 
   for (Rule rule : rules) {
-    if (rule.LHS.lexeme == lhs.lexeme) {
+    if (rule.LHS == lhs) {
       ret.push_back(rule);
     }
     else {
@@ -756,6 +764,31 @@ void sortRules(std::vector<Rule>* rules) {
 }
 
 
+std::vector<Token> longestCommonPrefix(const std::vector<Rule>& vecs) 
+{
+  std::vector<Token> prefix;
+  
+  for (int i = 0; i < vecs.size(); i++) {
+    for (int j = i+1; j < vecs.size(); j++) {
+      std::vector<Token> candidate;
+      Rule rule1 = vecs[i];
+      Rule rule2 = vecs[j];
+      for (int k = 0; k < rule1.RHS.size() && k < rule2.RHS.size(); k++){
+        if (rule1.RHS[k] == rule2.RHS[k]) {
+          candidate.push_back(rule1.RHS[k]);
+        }
+        else {
+          break;
+        }
+      }
+      // switch if larger
+      if (candidate.size() > prefix.size())
+        prefix = candidate;
+    }
+  }
+
+  return prefix;
+}
 
 
 
@@ -866,10 +899,28 @@ void Task5()
   while (!cfg.nonterminals.empty()) {
     for (Token nonterm : cfg.nonterminals) {
       //TODO: determine if true
-      bool nontermHasCommonPrefix = false;
+      std::vector<Token> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
 
-      if (nontermHasCommonPrefix) {
+      if (prefix.size() > 0) {
         //TODO: logic
+        std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
+        //std::vector<Rule> noPrefix = cfg.popRulesWith(nonterm);
+
+        Token newTok;
+        newTok.lexeme = nonterm.lexeme;
+        newTok.lexeme.append("1");
+
+        // remove rules with prefix  (DONE)
+        Rule condensedRule = Rule(nonterm, prefix);
+        condensedRule.RHS.push_back(newTok);
+        cfg.rules.push_back(condensedRule);
+
+        // add rules with new prefix
+        for (Rule rule : withPrefix) {
+          rule.LHS = newTok;
+          rule.cutBeginning(prefix.size());
+          cfg.rules.push_back(rule);
+        }
       }
       else {
         // Remove rules with nonterm and add to cfg_prime.rules
@@ -890,9 +941,6 @@ void Task5()
     cfg.nonterminals = operatingNonterminals;
   }
 
-  for (Rule rule : cfg_prime.rules) {
-    rule.Print();
-  }
   sortRules(&cfg_prime.rules);
   for (Rule rule : cfg_prime.rules) {
     rule.Print();

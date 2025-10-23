@@ -22,6 +22,10 @@ class Token {
     std::string lexeme;
     TokenType token_type;
     int line_no;
+
+  bool operator==(const Token& other) const{
+    return other.lexeme == this->lexeme;
+  }
 };
 
 class LexicalAnalyzer {
@@ -29,6 +33,7 @@ class LexicalAnalyzer {
     Token GetToken();
     Token peek(int);
     LexicalAnalyzer();
+
 
   private:
     std::vector<Token> tokenList;
