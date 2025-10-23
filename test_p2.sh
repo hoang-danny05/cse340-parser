@@ -68,7 +68,7 @@ for test_file in $(find "./tests" -type f -name "*.txt" | sort); do
         echo "${name}: OK"
     fi
     echo "========================================================"
-    rm -f ${output_file}
+    #rm -f ${output_file}
     rm -f ${diff_file}
 done
 

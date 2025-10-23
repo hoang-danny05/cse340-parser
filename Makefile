@@ -22,9 +22,9 @@ test4:
 	rm ./a.out
 
 test5:
+	rm ./a.out*
 	make it 
 	./a.out < tests/test09.txt 5
-	rm ./a.out
 
 fulltest:
 	make it 

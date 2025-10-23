@@ -45,7 +45,7 @@ public:
       if ((other->RHS.at(i).lexeme.compare(this->RHS.at(i).lexeme) < 0)) {
         return -1;
       }
-      else if ((other->RHS.at(i).lexeme.compare(this->RHS.at(i).lexeme) < 0)) {
+      else if ((other->RHS.at(i).lexeme.compare(this->RHS.at(i).lexeme) > 0)) {
         return 1;
       }
     }
@@ -57,8 +57,9 @@ public:
   }
 
   void cutBeginning(int cutLength) {
+    //std::cout << "len: " << cutLength << std::endl;
     std::vector<Token> newRHS;
-    for (int i = cutLength-1; i < RHS.size(); i++) {
+    for (int i = cutLength; i < RHS.size(); i++) {
       newRHS.push_back(RHS[i]);
     }
     RHS = newRHS;
