@@ -830,6 +830,9 @@ bool Rule::isNull() {
 }
 
 bool Rule::hasPrefix(std::vector<Token> prefix){
+  if(RHS.size() < prefix.size()) {
+    return false;
+  }
   for (int i = 0; i < prefix.size(); i++) {
     if (!(prefix.at(i).lexeme == RHS.at(i).lexeme))
       return false;
@@ -897,9 +900,18 @@ void Task5()
 
   while (!cfg.nonterminals.empty()) {
     for (Token nonterm : cfg.nonterminals) {
+      if (DEBUGGING)
+        std::cout << "starting nonterm: " << nonterm.lexeme << std::endl;
       std::vector<Token> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
 
       if (prefix.size() > 0) {
+        if(DEBUGGING) {
+          std::cout << "prefix exist! \nprf:" << prefix.size() << "\n";
+          for (Token t : prefix) {
+            cout << t.lexeme << ", ";
+          }
+          cout<< "worked\n";
+        }
 
         // remove rules with prefix
         std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
