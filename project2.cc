@@ -17,7 +17,9 @@
 /// START cfg definition
 ////////////////////////////////////////////////////
 
-static const bool DEBUGGING = true;
+static const bool DEBUGGING = false;
+bool vecContains(std::vector<Token>, Token);
+int vecAddTo(std::vector<Token>*, std::vector<Token>*);
 
 class Rule {
 public: 
@@ -51,7 +53,7 @@ public:
     if (this->RHS.size() == other->RHS.size()) {
       return 0;
     }
-    return (other->RHS.size() < this->RHS.size());
+    return (other->RHS.size() > this->RHS.size());
   }
 
   void cutBeginning(int cutLength) {
@@ -89,8 +91,6 @@ public:
   std::map<std::string, std::vector<Token>> follow;
 
   // helpers 
-  bool vecContains(std::vector<Token>, Token);
-  int vecAddTo(std::vector<Token>*, std::vector<Token>*);
 
   std::vector<Rule> getRulesWith(Token);
   std::vector<Rule> popRulesWith(Token);
@@ -194,7 +194,7 @@ void ContextFreeGrammar::init() {
 /////////////////////////////////////////////////////////////////////////
 
 // checks lexeme, nothing else!
-bool ContextFreeGrammar::vecContains(std::vector<Token> vec, Token item) {
+bool vecContains(std::vector<Token> vec, Token item) {
   for(int i = 0; i < vec.size(); i++) {
     if (vec.at(i).lexeme == item.lexeme)
       return true;
@@ -343,7 +343,7 @@ void ContextFreeGrammar::PrintNullable() {
 
 //NOTE: USE THIS AS SET ADDITION, NOTHING ELSE
 // returns changesMade
-int ContextFreeGrammar::vecAddTo(std::vector<Token>* from, std::vector<Token>* to) {
+int vecAddTo(std::vector<Token>* from, std::vector<Token>* to) {
   int changesMade = 0;
 
   // for term in termsToAdd
@@ -891,26 +891,24 @@ void Task5()
   ContextFreeGrammar cfg_prime;
   // hoping these clone the vectors
   cfg_prime.terminals = cfg.terminals;
-  // must also have same starting rule.
 
-  // only modify THIS when doing stuff
   std::vector<Token> operatingNonterminals = cfg.nonterminals;
 
   while (!cfg.nonterminals.empty()) {
     for (Token nonterm : cfg.nonterminals) {
-      //TODO: determine if true
       std::vector<Token> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
 
       if (prefix.size() > 0) {
-        //TODO: logic
-        std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
-        //std::vector<Rule> noPrefix = cfg.popRulesWith(nonterm);
 
+        // remove rules with prefix
+        std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
+
+        // add rule (prefix)(newTok)
         Token newTok;
         newTok.lexeme = nonterm.lexeme;
         newTok.lexeme.append("1");
+        cfg_prime.nonterminals.push_back(newTok);
 
-        // remove rules with prefix  (DONE)
         Rule condensedRule = Rule(nonterm, prefix);
         condensedRule.RHS.push_back(newTok);
         cfg.rules.push_back(condensedRule);
@@ -919,27 +917,45 @@ void Task5()
         for (Rule rule : withPrefix) {
           rule.LHS = newTok;
           rule.cutBeginning(prefix.size());
-          cfg.rules.push_back(rule);
+          cfg_prime.rules.push_back(rule);
+        }
+        if(DEBUGGING) {
+          cout << "New rules:\n";
+          for (Rule r : cfg.rules) {
+            cout << "> rl: ";
+            r.Print();
+          }
         }
       }
       else {
-        // Remove rules with nonterm and add to cfg_prime.rules
+        // No left factoring possible!!
+        // Remove rules with nonterm 
+        // add to cfg_prime.rules
         for (Rule rule : cfg.popRulesWith(nonterm)) {
           cfg_prime.rules.push_back(rule);
         }
         // Remove nonterm from Nonterminals and move to cfg_prime.nonterminals
-        cfg_prime.nonterminals.push_back(nonterm);
-        operatingNonterminals.clear();
-        for (Token nt : cfg.nonterminals) {
-          if (nt.lexeme != nonterm.lexeme)
-            operatingNonterminals.push_back(nt);
+        if(DEBUGGING) {
+          cout << "Before copying nonterms\n";
+          for (Token tok : operatingNonterminals) {
+            cout << "> nt: " << tok.lexeme << "\n";
+          }
         }
+        cfg_prime.nonterminals.push_back(nonterm);
+        vector<Token> newNonterm;
+        for (Token nt : operatingNonterminals) {
+          if (nt.lexeme != nonterm.lexeme)
+            newNonterm.push_back(nt);
+        }
+        operatingNonterminals = newNonterm;
         if (DEBUGGING)
           cout << "Removed nonterm " << nonterm.lexeme << "\n";
-      }
-    }
+      } // end else
+    } // for(nonterm in nonterminal)
     cfg.nonterminals = operatingNonterminals;
-  }
+
+    //exit(1);
+  } // end while
 
   sortRules(&cfg_prime.rules);
   for (Rule rule : cfg_prime.rules) {
