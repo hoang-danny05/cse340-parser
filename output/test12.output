@@ -1,9 +1,9 @@
-A -> C B A1 #
+A -> C B A2 #
 A1 -> B #
-A1 -> B #
-A1 -> C A1 #
 A1 -> D #
-A1 -> D #
+A2 -> B #
+A2 -> C A1 #
+A2 -> D #
 B -> b #
 C -> c #
 D -> d #

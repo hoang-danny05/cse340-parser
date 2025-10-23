@@ -897,6 +897,7 @@ void Task5()
   cfg_prime.terminals = cfg.terminals;
 
   std::vector<Token> operatingNonterminals = cfg.nonterminals;
+  int step_count = 0;
 
   while (!cfg.nonterminals.empty()) {
     for (Token nonterm : cfg.nonterminals) {
@@ -906,11 +907,12 @@ void Task5()
 
       if (prefix.size() > 0) {
         if(DEBUGGING) {
-          std::cout << "prefix exist! \nprf:" << prefix.size() << "\n";
+          std::cout << "prefix exist! \nlen:" << prefix.size() << "\n";
+          cout<< "Prefix:\n\t";
           for (Token t : prefix) {
             cout << t.lexeme << ", ";
           }
-          cout<< "worked\n";
+          cout<<endl;
         }
 
         // remove rules with prefix
@@ -918,8 +920,12 @@ void Task5()
 
         // add rule (prefix)(newTok)
         Token newTok;
-        newTok.lexeme = nonterm.lexeme;
-        newTok.lexeme.append("1");
+        for (int k = 1; k < 10; k++) {
+          newTok.lexeme = nonterm.lexeme + to_string(k);
+          if (!(vecContains(cfg_prime.nonterminals, newTok))) {
+            break;
+          }
+        }
         cfg_prime.nonterminals.push_back(newTok);
 
         Rule condensedRule = Rule(nonterm, prefix);
@@ -967,7 +973,13 @@ void Task5()
     } // for(nonterm in nonterminal)
     cfg.nonterminals = operatingNonterminals;
 
-    //exit(1);
+    if (DEBUGGING) {
+      cout << "**after iteration " << ++step_count << endl;
+      for (Rule rule : cfg_prime.rules) {
+        rule.Print();
+      }
+    }
+
   } // end while
 
   sortRules(&cfg_prime.rules);
