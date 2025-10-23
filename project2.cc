@@ -8,25 +8,52 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <map>
 #include "lexer.h"
-#include "CFG.h"
 
 ////////////////////////////////////////////////////
 /// START cfg definition
 ////////////////////////////////////////////////////
 
-static const bool DEBUGGING = false;
+static const bool DEBUGGING = true;
 
 class Rule {
 public: 
   Rule(Token, std::vector<Token>);
+  Rule();
   void Print();
   bool isNull();
+  bool hasPrefix(std::vector<Token>);
 
   Token LHS; 
   std::vector<Token> RHS;
+
+  int compare(Rule *other) {
+
+    if ((other->LHS.lexeme.compare(this->LHS.lexeme) < 0)) {
+      return -1;
+    }
+    else if ((other->LHS.lexeme.compare(this->LHS.lexeme) > 0)) {
+      return 1;
+    }
+
+    for (int i = 0; i < other->RHS.size() && i < this->RHS.size(); i++) {
+      if ((other->RHS.at(i).lexeme.compare(this->RHS.at(i).lexeme) < 0)) {
+        return -1;
+      }
+      else if ((other->RHS.at(i).lexeme.compare(this->RHS.at(i).lexeme) < 0)) {
+        return 1;
+      }
+    }
+
+    if (this->RHS.size() == other->RHS.size()) {
+      return 0;
+    }
+    return (other->RHS.size() < this->RHS.size());
+  }
+
 private:
   Token tmp;
 };
@@ -52,13 +79,20 @@ public:
 
   std::map<std::string, std::vector<Token>> first;
   std::map<std::string, std::vector<Token>> follow;
+
+  // helpers 
+  bool vecContains(std::vector<Token>, Token);
+  int vecAddTo(std::vector<Token>*, std::vector<Token>*);
+
+  std::vector<Rule> getRulesWith(Token);
+  std::vector<Rule> popRulesWith(Token);
+  std::vector<Rule> popRulesWithPrefix(Token, std::vector<Token>);
+
 private:
   void initTokens();
   void initNullable();
   void initFirst();
   void initFollow();
-  bool vecContains(std::vector<Token>, Token);
-  int vecAddTo(std::vector<Token>*, std::vector<Token>*);
 };
 ////////////////////////////////////////////////////
 /// END cfg header
@@ -656,6 +690,78 @@ void ContextFreeGrammar::PrintFollow() {
 }
 
 /////////////////////////////////////////////////////////////////////////
+// Task 5 helpers
+/////////////////////////////////////////////////////////////////////////
+
+// returns all rules with a certain LHS
+std::vector<Rule> ContextFreeGrammar::getRulesWith(Token lhs) {
+  std::vector<Rule> ret;
+
+  for (Rule rule : rules) {
+    if (rule.LHS.lexeme == lhs.lexeme) {
+      ret.push_back(rule);
+    }
+  }
+
+  return ret;
+}
+
+// returns all rules with a certain LHS
+std::vector<Rule> ContextFreeGrammar::popRulesWith(Token lhs) {
+  std::vector<Rule> ret;
+  std::vector<Rule> newRules;
+
+  for (Rule rule : rules) {
+    if (rule.LHS.lexeme == lhs.lexeme) {
+      ret.push_back(rule);
+    }
+    else {
+      newRules.push_back(rule);
+    }
+  }
+
+  rules = newRules;
+  return ret;
+}
+
+std::vector<Rule> ContextFreeGrammar::popRulesWithPrefix(Token lhs, std::vector<Token> prefix) {
+  std::vector<Rule> ret;
+  std::vector<Rule> newRules;
+
+  for (Rule rule : rules) {
+    if ((rule.LHS.lexeme == lhs.lexeme) && (rule.hasPrefix(prefix))) {
+      ret.push_back(rule);
+    }
+    else {
+      newRules.push_back(rule);
+    }
+  }
+
+  rules = newRules;
+  return ret;
+}
+
+void sortRules(std::vector<Rule>* rules) {
+  for (int i = 0; i < rules->size(); i++) {
+    Rule temp;
+    for (int j = i+1; j < rules->size(); j++) {
+      if (rules->at(j).compare(&rules->at(i)) > 0) {
+        temp = rules->at(j);
+        rules->at(j) = rules->at(i);
+        rules->at(i) = temp;
+        continue;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
 // rule stuff
 /////////////////////////////////////////////////////////////////////////
 
@@ -665,17 +771,38 @@ Rule::Rule(Token lhs, std::vector<Token> rhs) {
   RHS = rhs;
 }
 
+Rule::Rule() {
+}
+
+
+// void Rule::Print() {
+//   std::cout << "\tRULE: " << LHS.lexeme << " --> ";
+//   for(int i = 0; i < RHS.size(); i++) {
+//     std::cout << RHS.at(i).lexeme << " ";
+//   }
+//   std::cout << "\n\n";
+// }
+
 void Rule::Print() {
-  std::cout << "\tRULE: " << LHS.lexeme << " --> ";
+  std::cout << LHS.lexeme << " -> ";
   for(int i = 0; i < RHS.size(); i++) {
     std::cout << RHS.at(i).lexeme << " ";
   }
-  std::cout << "\n\n";
+  std::cout << "#\n";
 }
 
 bool Rule::isNull() {
   return RHS.empty();
 }
+
+bool Rule::hasPrefix(std::vector<Token> prefix){
+  for (int i = 0; i < prefix.size(); i++) {
+    if (!(prefix.at(i).lexeme == RHS.at(i).lexeme))
+      return false;
+  }
+  return true;
+}
+
 
 ////////////////////////////////////////////////////
 /// END cfg definition
@@ -728,7 +855,48 @@ void Task4()
 // Task 5: left factoring
 void Task5()
 {
+  ContextFreeGrammar cfg_prime;
+  // hoping these clone the vectors
+  cfg_prime.terminals = cfg.terminals;
+  // must also have same starting rule.
 
+  // only modify THIS when doing stuff
+  std::vector<Token> operatingNonterminals = cfg.nonterminals;
+
+  while (!cfg.nonterminals.empty()) {
+    for (Token nonterm : cfg.nonterminals) {
+      //TODO: determine if true
+      bool nontermHasCommonPrefix = false;
+
+      if (nontermHasCommonPrefix) {
+        //TODO: logic
+      }
+      else {
+        // Remove rules with nonterm and add to cfg_prime.rules
+        for (Rule rule : cfg.popRulesWith(nonterm)) {
+          cfg_prime.rules.push_back(rule);
+        }
+        // Remove nonterm from Nonterminals and move to cfg_prime.nonterminals
+        cfg_prime.nonterminals.push_back(nonterm);
+        operatingNonterminals.clear();
+        for (Token nt : cfg.nonterminals) {
+          if (nt.lexeme != nonterm.lexeme)
+            operatingNonterminals.push_back(nt);
+        }
+        if (DEBUGGING)
+          cout << "Removed nonterm " << nonterm.lexeme << "\n";
+      }
+    }
+    cfg.nonterminals = operatingNonterminals;
+  }
+
+  for (Rule rule : cfg_prime.rules) {
+    rule.Print();
+  }
+  sortRules(&cfg_prime.rules);
+  for (Rule rule : cfg_prime.rules) {
+    rule.Print();
+  }
 }
 
 // Task 6: eliminate left recursion

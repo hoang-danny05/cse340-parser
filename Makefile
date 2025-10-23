@@ -1,5 +1,5 @@
 it: 
-	g++ project2.cc lexer.cc inputbuf.cc CFG.cc
+	g++ project2.cc lexer.cc inputbuf.cc 
 
 test1:
 	make it 
@@ -19,6 +19,11 @@ test3:
 test4:
 	make it 
 	./a.out < tests/test11.txt 4
+	rm ./a.out
+
+test5:
+	make it 
+	./a.out < tests/test09.txt 5
 	rm ./a.out
 
 fulltest:
