@@ -1,7 +1,7 @@
+DONE
+A -> A a B #
+A -> A A b B #
 A -> #
-A -> A A1 #
-A1 -> A b B #
-A1 -> a B #
 B -> C A #
 B -> c a a a a C b b b b A #
 C -> #
@@ -9,7 +9,10 @@ C -> C c C #
 C -> E B #
 D -> E F #
 E -> F E #
-F -> C C #
 F -> D z D #
+F -> C #
+F -> C c C C #
+F -> F E B C #
 S -> A B e F D #
-S -> B C d E F #
+S -> C A C d E F #
+S -> c a a a a C b b b b A C d E F #

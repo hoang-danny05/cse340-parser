@@ -1,13 +1,14 @@
-A -> #
+DONE
 A -> a B G C a #
-B -> #
+A -> #
 B -> A C G C b #
-C -> #
+B -> #
 C -> c C x #
+C -> #
 D -> #
 D -> F G G F #
-E -> #
 E -> A A A A A A D D D D D D G G G G G F E B B B B C C C A A A #
+E -> #
 F -> f a a #
-G -> #
 G -> g G G G z #
+G -> #
