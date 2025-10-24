@@ -26,6 +26,9 @@ class Token {
   bool operator==(const Token& other) const{
     return other.lexeme == this->lexeme;
   }
+  int compare(const Token& other) {
+    return this->lexeme.compare(other.lexeme);
+  } 
 };
 
 class LexicalAnalyzer {

@@ -26,6 +26,12 @@ test5:
 	make it 
 	./a.out < tests/test12.txt 5
 
+test6:
+	rm -f ./a.out*
+	make it 
+	./a.out < tests/test03.txt 6
+
+
 fulltest:
 	make it 
 	bash test_01.sh	

@@ -69,12 +69,11 @@ public:
     return (this->compare(&other)) == 0;
   }
 
-  Rule afterPrefix(int prefixLen) {
-    Rule ret;
+  std::vector<Token> afterPrefix(int prefixLen) {
+    std::vector<Token> ret;
     for (int i = prefixLen; i < RHS.size(); i++) {
-      ret.RHS.push_back(RHS[i]);
+      ret.push_back(RHS[i]);
     }
-    ret.LHS = this->LHS;
     return ret;
   }
 
@@ -811,8 +810,8 @@ std::vector<Token> longestCommonPrefix(const std::vector<Rule>& vecs)
 /////////////////////////////////////////////////////////////////////////
 
 
-void vecRemoveItem(Rule rule, vector<Rule> *rules) {
-  vector<Rule> newRules;
+void vecRemoveItem(std::vector<Rule> *rules, Rule rule) {
+  std::vector<Rule> newRules;
   for (Rule r : *rules) {
     if(!(rule == r))
       newRules.push_back(r);
@@ -945,6 +944,7 @@ void Task5()
         std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
 
         // add rule (prefix)(newTok)
+
         Token newTok;
         for (int k = 1; k < 10; k++) {
           newTok.lexeme = nonterm.lexeme + to_string(k);
@@ -952,6 +952,7 @@ void Task5()
             break;
           }
         }
+
         cfg_prime.nonterminals.push_back(newTok);
 
         Rule condensedRule = Rule(nonterm, prefix);
@@ -1018,7 +1019,23 @@ void Task5()
 void Task6()
 {
   ContextFreeGrammar cfg_prime;
+  // sort nonterminals 
+  for (int i = 0; i < cfg.nonterminals.size(); i++) {
+    for (int j = i+1; j < cfg.nonterminals.size(); j++) {
+      if (cfg.nonterminals[i].compare(cfg.nonterminals[j]) > 0) {
+        Token temp = cfg.nonterminals[i];
+        cfg.nonterminals[i] = cfg.nonterminals[j];
+        cfg.nonterminals[j] = temp;
+      }
+    }
+  }
+
+  // for (Token t : cfg.nonterminals) {
+  //   cout << t.lexeme << ", ";
+  // }
+
   cfg_prime.nonterminals = cfg.nonterminals;
+
 
   // For nonterm
   // there are two types of rules:
@@ -1047,26 +1064,129 @@ void Task6()
   for int i..n
     for int j..i
       for rule [r] in Rules[nonterm[i]]
-        if r.hasPrefix(nonterm[j]):                                 
+        if r.has!Prefix(nonterm[j]):                                 
           let (after_prefix) be r.RHS[j:]                           TODO: Rule::afterPrefix() -> rule
           remove r from Rules[nonterm[i]]                           TODO: vecRemoveItem(vec, item)
           forall rule [sub_r] in Rules[nonterm[j]]:
             if sub_r has form {nonterm[j] -> (delta)}
               let (delta) be sub_r.RHS
-              add rule {nonterm[j] -> (delta)()} to Rules[nonterm[j]]
+              add rule {nonterm[j] -> (delta)()} to Rules[nonterm[i]]
 ]         
   */      
-  for(int i = 0; i < cfg.nonterminals.size(); i++) {
-    for(int j = 0; j < i; j++) {
-      for (Rule r: Rules[cfg.nonterminals[i]]) {
-        if(r.hasPrefix({cfg.nonterminals[j]})) {
-          // need to remove r from nonterm[i] 
+  // bool changed = true;
+  // while(changed) {
+  //
+  // }
 
+  for(int i = 0; i < cfg.nonterminals.size(); i++) {
+    const string nonterm_i = cfg.nonterminals[i].lexeme;
+    for(int j = 0; j < i; j++) {
+      const string nonterm_j = cfg.nonterminals[j].lexeme;
+      vector<Rule> operatingRules = Rules[nonterm_i];
+      for (Rule r: Rules[nonterm_i]) {
+        operatingRules = Rules[cfg.nonterminals[i].lexeme];
+        if(r.hasPrefix({cfg.nonterminals[j]})) {
+          vector<Token> after_prefix = r.afterPrefix(1);
+          // going to remove offending rule
+          vecRemoveItem(&operatingRules, r);
+
+          // substitute offending rules
+          for (Rule sub_r : Rules[cfg.nonterminals[j].lexeme]) {
+            // if sub_r has form.. but i don't understand delta
+            if (true) {
+              vector<Token> delta = sub_r.RHS;
+              Rule newRule;
+              newRule.LHS = cfg.nonterminals[i];
+              newRule.RHS = delta;
+              for (Token t : after_prefix) {
+                newRule.RHS.push_back(t);
+              }
+              operatingRules.push_back(newRule);
+            }
+          }
         } // if has prefix
       }// for r : rule starting with nonterminals[i]
+      Rules[nonterm_i] = operatingRules;
     }// for j
 
     //TODO: remove immediate left recursion
+
+    // vector<Rule> hasRecursion = cfg.popRulesWithPrefix(cfg.nonterminals[i], {cfg.nonterminals[i]});
+    // vector<Rule> noRecursion = cfg.popRulesWith(cfg.nonterminals[i]);
+    vector<Rule> hasRecursion;
+    vector<Rule> noRecursion;
+    vector<Rule> splitMe = Rules[nonterm_i];
+    for (Rule r: splitMe) {
+      if (r.RHS.size() > 0 && r.hasPrefix({cfg.nonterminals[i]})) {
+        hasRecursion.push_back(r);
+      } else {
+        noRecursion.push_back(r);
+      }
+    }
+
+
+    /*
+     * A->A(alpha)
+     * A->(beta)
+     *
+     * goes to 
+     *
+     * A-> (beta)A1
+     * A1 -> (alpha)A1 | epsilon
+     *
+     *
+     * Ex)
+     *
+     * A->Aa
+     * A->b 
+     * ==
+     * A->bA1 
+     * A1->aA1 | epsilon
+     *
+     * A->Aa
+     * A->Ac
+     * A->b 
+     * ==
+     * A->bA1
+     * A1->aA1 | cA1 | epsilon 
+     *
+     * A-> Aa
+     * A-> b
+     * A-> d
+     * ==
+     * A-> bA1 | dA1 
+     * A1->aA1 | epsilon
+     *
+     * */
+    
+    Token newTok;
+    for (int k = 1; k < 10; k++) {
+      newTok.lexeme = cfg.nonterminals[i].lexeme + to_string(k);
+      break;
+      // if (!(vecContains(cfg_prime.nonterminals, newTok))) {
+      //   break;
+      // }
+    }
+    vector<Rule> newRules;
+
+    for (int i = 0; i < hasRecursion.size(); i++) {
+      Rule newRule;
+      vector<Token> alpha = hasRecursion[i].afterPrefix(1);
+      newRule.LHS = newTok;
+      newRule.RHS = alpha;
+      newRule.RHS.push_back(newTok);
+      newRules.push_back(newRule);
+    }
+    // epsilon
+    Rule newRule;
+    newRule.LHS = newTok;
+    newRules.push_back(newRule);
+
+    for (Rule betaRule : noRecursion) {
+      betaRule.RHS.push_back(newTok);
+      newRules.push_back(betaRule);
+    }
+
   } // for i
 
 
@@ -1076,9 +1196,12 @@ void Task6()
   // }
 
   
+  cout << "DONE\n";
   sortRules(&cfg_prime.rules);
-  for (Rule rule : cfg_prime.rules) {
-    rule.Print();
+  for (Token nonterm : cfg.nonterminals) {
+    for (Rule r : Rules[nonterm.lexeme]) {
+      r.Print();
+    }
   }
 }
     
