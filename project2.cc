@@ -32,7 +32,7 @@ public:
   Token LHS; 
   std::vector<Token> RHS;
 
-  int compare(Rule *other) {
+  int compare(const Rule *other) {
 
     if ((other->LHS.lexeme.compare(this->LHS.lexeme) < 0)) {
       return -1;
@@ -63,6 +63,19 @@ public:
       newRHS.push_back(RHS[i]);
     }
     RHS = newRHS;
+  }
+
+  bool operator ==(const Rule& other) {
+    return (this->compare(&other)) == 0;
+  }
+
+  Rule afterPrefix(int prefixLen) {
+    Rule ret;
+    for (int i = prefixLen; i < RHS.size(); i++) {
+      ret.RHS.push_back(RHS[i]);
+    }
+    ret.LHS = this->LHS;
+    return ret;
   }
 
 private:
@@ -793,6 +806,19 @@ std::vector<Token> longestCommonPrefix(const std::vector<Rule>& vecs)
 
 
 
+/////////////////////////////////////////////////////////////////////////
+// Task 6 helpers
+/////////////////////////////////////////////////////////////////////////
+
+
+void vecRemoveItem(Rule rule, vector<Rule> *rules) {
+  vector<Rule> newRules;
+  for (Rule r : *rules) {
+    if(!(rule == r))
+      newRules.push_back(r);
+  }
+  *rules = newRules;
+}
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -991,6 +1017,69 @@ void Task5()
 // Task 6: eliminate left recursion
 void Task6()
 {
+  ContextFreeGrammar cfg_prime;
+  cfg_prime.nonterminals = cfg.nonterminals;
+
+  // For nonterm
+  // there are two types of rules:
+
+  // forall alpha, beta
+  //
+  // nonterm -> (nonterm) (alpha)
+  // nonterm -> (beta)
+  //    beta does not have nonterm
+  //
+  // given newNT symbol (aka nonterm1)
+  // equal to:
+  // 
+  // nonterm -> (beta) (newNT)
+  // newNT -> (alpha) (newNT)
+  // newNT -> epsilon
+
+  // group similar nonterminals
+  map<string, vector<Rule>> Rules;
+  for (Token nt : cfg.nonterminals) {
+    Rules.insert({nt.lexeme, cfg.getRulesWith(nt)});
+  }
+
+
+  /* 
+  for int i..n
+    for int j..i
+      for rule [r] in Rules[nonterm[i]]
+        if r.hasPrefix(nonterm[j]):                                 
+          let (after_prefix) be r.RHS[j:]                           TODO: Rule::afterPrefix() -> rule
+          remove r from Rules[nonterm[i]]                           TODO: vecRemoveItem(vec, item)
+          forall rule [sub_r] in Rules[nonterm[j]]:
+            if sub_r has form {nonterm[j] -> (delta)}
+              let (delta) be sub_r.RHS
+              add rule {nonterm[j] -> (delta)()} to Rules[nonterm[j]]
+]         
+  */      
+  for(int i = 0; i < cfg.nonterminals.size(); i++) {
+    for(int j = 0; j < i; j++) {
+      for (Rule r: Rules[cfg.nonterminals[i]]) {
+        if(r.hasPrefix({cfg.nonterminals[j]})) {
+          // need to remove r from nonterm[i] 
+
+        } // if has prefix
+      }// for r : rule starting with nonterminals[i]
+    }// for j
+
+    //TODO: remove immediate left recursion
+  } // for i
+
+
+  // for (Token nonterm: cfg.nonterminals) {
+  //   vector<Rule> hasRecursion = cfg.popRulesWithPrefix(nonterm, {nonterm});
+  //   vector
+  // }
+
+  
+  sortRules(&cfg_prime.rules);
+  for (Rule rule : cfg_prime.rules) {
+    rule.Print();
+  }
 }
     
 int main (int argc, char* argv[])
