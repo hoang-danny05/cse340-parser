@@ -22,7 +22,7 @@ test4:
 	rm ./a.out
 
 test5:
-	rm ./a.out*
+	rm -f ./a.out*
 	make it 
 	./a.out < tests/test12.txt 5
 
