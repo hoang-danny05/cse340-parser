@@ -4,5 +4,5 @@ B -> d A #
 C -> c B #
 C -> e B #
 C -> f B x A #
-S -> k A #
 S -> a B #
+S -> k A #

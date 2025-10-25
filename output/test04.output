@@ -22,9 +22,9 @@ T -> Y X A D d #
 U -> V W #
 V -> W #
 W -> X #
-X -> Y Z #
 X -> F A I R Q P z #
-Y -> Y Z W B i S O F T #
+X -> Y Z #
 Y -> F A I R Q P z W B i S O F T #
-Z -> Y Z W #
+Y -> Y Z W B i S O F T #
 Z -> F A I R Q P z W #
+Z -> Y Z W #

@@ -1,1 +1,5 @@
 provided_code_and_sample_tests-1.zip
+tests/
+output/
+testenv/tests/
+testenv/output/

@@ -1197,8 +1197,8 @@ void Task6()
 
   
   cout << "DONE\n";
-  sortRules(&cfg_prime.rules);
   for (Token nonterm : cfg.nonterminals) {
+    sortRules(&Rules[nonterm.lexeme]);
     for (Rule r : Rules[nonterm.lexeme]) {
       r.Print();
     }

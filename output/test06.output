@@ -1,14 +1,14 @@
 DONE
-A -> a B G C a #
 A -> #
-B -> A C G C b #
+A -> a B G C a #
 B -> #
-C -> c C x #
+B -> A C G C b #
 C -> #
+C -> c C x #
 D -> #
 D -> F G G F #
-E -> A A A A A A D D D D D D G G G G G F E B B B B C C C A A A #
 E -> #
+E -> A A A A A A D D D D D D G G G G G F E B B B B C C C A A A #
 F -> f a a #
-G -> g G G G z #
 G -> #
+G -> g G G G z #
