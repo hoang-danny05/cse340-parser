@@ -279,10 +279,124 @@ void Task5()
   }
 }
 
+Rule substituteStartWith(const Rule&, const Rule&);
+void eliminateIndirectRecursion(string, string, ContextFreeGrammar*);
+//void eliminateDirectRecursion();
+
+Rule substituteStartWith(const Rule& replacee, const Rule& replacer) {
+  if (replacee.RHS.size() < 1)
+    std::exit(1); 
+  Rule newRule = Rule(replacee.LHS, replacer.RHS);
+  for (int i = 1; i < replacee.RHS.size(); i++){
+    newRule.RHS.push_back(replacee.RHS[i]);
+  }
+  return newRule;
+}
+
+void eliminateIndirectRecursion(
+  string A_i,  // current nonterminal
+  string A_j,  // target of replacement
+  ContextFreeGrammar* grammar
+) {
+  vector<Rule> offendingRules = grammar->popRulesWithPrefix(A_i, {A_j});
+  vector<Rule> substitutionRules = grammar-> getRulesWith(A_j);
+
+  cout << "OFFENDER\n";
+  for (Rule offender : offendingRules) {
+    offender.Print();
+  }
+  cout << "SUBBER\n";
+  for (Rule offender : substitutionRules) {
+    offender.Print();
+  }
+
+
+
+  for (Rule offender : offendingRules) {
+    for (Rule substitution : substitutionRules) {
+      // make offender Ai -> Aj alpha
+      // Ai -> delta alpha
+      // where Aj -> delta
+      cout << "Substituting[\n";
+      substitution.Print();
+      offender.Print();
+      cout << "]\n";
+      grammar->rules.push_back(substituteStartWith(offender, substitution));
+      grammar->Print();
+    }
+  }
+  sortRules(&grammar->rules);
+}
+
 // Task 6: eliminate left recursion
 void Task6()
 {
+  // sort nonterminals
+  for (int i = 0; i < cfg.nonterminals.size(); i++) {
+    for (int j = i+1; j < cfg.nonterminals.size(); j++) {
+      if (cfg.nonterminals[i].compare(cfg.nonterminals[j]) > 0){
+        string temp = cfg.nonterminals[i];
+        cfg.nonterminals[i] = cfg.nonterminals[j];
+        cfg.nonterminals[j] = temp;
+      }
+    }
+  }
+  sortRules(&cfg.rules);
+  cfg.PrintTokens();
+
+
+  cfg.Print();
+  // indirect left recursion, no rule can start with a rule before
+  for (int i = 0; i < cfg.nonterminals.size(); i++) {
+    for (int j = 0; j < i; j++) {
+      eliminateIndirectRecursion(
+        cfg.nonterminals[i],
+        cfg.nonterminals[j],
+        &cfg
+      );
+    }
+  }
+  cfg.Print();
+
+
+    /*
+     * A->A(alpha)
+     * A->(beta)
+     *
+     * goes to 
+     *
+     * A-> (beta)A1
+     * A1 -> (alpha)A1 | epsilon
+     *
+     *
+     * Ex)
+     *
+     * A->Aa
+     * A->b 
+     * ==
+     * A->bA1 
+     * A1->aA1 | epsilon
+     *
+     * A->Aa
+     * A->Ac
+     * A->b 
+     * ==
+     * A->bA1
+     * A1->aA1 | cA1 | epsilon 
+     *
+     * A-> Aa
+     * A-> b
+     * A-> d
+     * ==
+     * A-> bA1 | dA1 
+     * A1->aA1 | epsilon
+     *
+     * */
+    
 }
+
+
+
     
 int main (int argc, char* argv[])
 {

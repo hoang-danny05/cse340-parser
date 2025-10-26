@@ -48,6 +48,8 @@ public:
     RHS = newRHS;
   }
 
+  Rule substitutePrefix(int, vector<string>);
+
   bool operator ==(const Rule& other) {
     return (this->compare(&other)) == 0;
   }

@@ -634,6 +634,17 @@ bool Rule::hasPrefix(vector<string> prefix){
   return true;
 }
 
+Rule Rule::substitutePrefix(int prefixLen, vector<string> substitution) {
+  Rule newRule;
+  if (this->RHS.size() < prefixLen)
+    std::exit(1); 
+  for (int i = prefixLen; i < this->RHS.size(); i++){
+    substitution.push_back(newRule.RHS[i]);
+  }
+  newRule.RHS = substitution;
+  return newRule;
+}
+
 
 ////////////////////////////////////////////////////
 /// END cfg definition
