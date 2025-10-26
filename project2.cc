@@ -14,10 +14,7 @@
 #include "CFG.h"
 
 using namespace std;
-
-//////////////////////////////////////////////
-// Task 5 helpers
-//////////////////////////////////////////////
+ContextFreeGrammar cfg;
 
 bool vecContains(vector<string> vec, string item) {
   for(int i = 0; i < vec.size(); i++) {
@@ -28,55 +25,11 @@ bool vecContains(vector<string> vec, string item) {
 }
 
 
-// checks lexeme, nothing else!
+//////////////////////////////////////////////
+// Task 5 helpers
+//////////////////////////////////////////////
 
-// returns all rules with a certain LHS
-vector<Rule> ContextFreeGrammar::getRulesWith(string lhs) {
-  vector<Rule> ret;
-
-  for (Rule rule : rules) {
-    if (rule.LHS == lhs) {
-      ret.push_back(rule);
-    }
-  }
-
-  return ret;
-}
-
-// returns all rules with a certain LHS
-vector<Rule> ContextFreeGrammar::popRulesWith(string lhs) {
-  vector<Rule> ret;
-  vector<Rule> newRules;
-
-  for (Rule rule : rules) {
-    if (rule.LHS == lhs) {
-      ret.push_back(rule);
-    }
-    else {
-      newRules.push_back(rule);
-    }
-  }
-
-  rules = newRules;
-  return ret;
-}
-
-vector<Rule> ContextFreeGrammar::popRulesWithPrefix(string lhs, vector<string> prefix) {
-  vector<Rule> ret;
-  vector<Rule> newRules;
-
-  for (Rule rule : rules) {
-    if ((rule.LHS  == lhs ) && (rule.hasPrefix(prefix))) {
-      ret.push_back(rule);
-    }
-    else {
-      newRules.push_back(rule);
-    }
-  }
-
-  rules = newRules;
-  return ret;
-}
+// lexicograpic
 
 void sortRules(vector<Rule>* rules) {
   for (int i = 0; i < rules->size(); i++) {
@@ -96,7 +49,7 @@ void sortRules2(vector<Rule>* rules) {
   for (int i = 0; i < rules->size(); i++) {
     Rule temp;
     for (int j = i+1; j < rules->size(); j++) {
-      if (rules->at(j).compare(&rules->at(i)) > 0) {
+      if (rules->at(j).compare2(&rules->at(i)) > 0) {
         temp = rules->at(j);
         rules->at(j) = rules->at(i);
         rules->at(i) = temp;
@@ -106,37 +59,101 @@ void sortRules2(vector<Rule>* rules) {
   }
 }
 
-vector<string> longestCommonPrefix(const vector<Rule>& vecs) 
-{
-  vector<string> prefix;
-  
-  for (int i = 0; i < vecs.size(); i++) {
-    for (int j = i+1; j < vecs.size(); j++) {
-      vector<string> candidate;
-      Rule rule1 = vecs[i];
-      Rule rule2 = vecs[j];
-      for (int k = 0; k < rule1.RHS.size() && k < rule2.RHS.size(); k++){
-        if (rule1.RHS[k] == rule2.RHS[k]) {
-          candidate.push_back(rule1.RHS[k]);
-        }
-        else {
-          break;
-        }
-      }
-      // switch if larger
-      if (candidate.size() > prefix.size())
-        prefix = candidate;
+// recommended helpers
+
+int length_of_common_prefix(Rule rule1, Rule rule2) {
+  int i = 0;
+  // cout << "common prefix len for[\n";
+  // rule1.Print();
+  // rule2.Print();
+  // cout<<"]:";
+  for (; i < rule1.RHS.size() && i < rule2.RHS.size(); i++) {
+    if (!(rule1.RHS[i] == rule2.RHS[i])) {
+      return (i);
     }
   }
-
-  return prefix;
+  return (i);
 }
 
 
+int longest_match(const ContextFreeGrammar* grammar, const Rule rule) {
+  int longestMatch = 0;
+  for (Rule r : grammar->getRulesWith(rule.LHS)) {
+    if (rule.RHS == r.RHS) {
+      continue;
+    }
+    if (length_of_common_prefix(r, rule) > longestMatch) {
+      longestMatch = length_of_common_prefix(r, rule);
+    }
+  }
+  return longestMatch;
+}
 
-/////////////////////////////////////////////////////////////////////////
-// Task 6 helpers
-/////////////////////////////////////////////////////////////////////////
+// <1 if rule1 is before
+// >1 if rule1 is after
+int compareByLongestMatch(ContextFreeGrammar* grammar, Rule rule1, Rule rule2) {
+  cout << "comp: [\n";
+  rule1.Print();
+  rule2.Print();
+  cout  << "]\n";
+  if (rule1.LHS.compare(rule2.LHS) > 0) {
+    cout << "before!\n\n";
+    return -1;
+  }
+  if (rule1.LHS.compare(rule2.LHS) < 0) {
+    cout << "after!\n\n";
+    return 1;
+  }
+  if (longest_match(grammar, rule1) < longest_match(grammar, rule2)) 
+    return -1;
+  if (longest_match(grammar, rule1) > longest_match(grammar, rule2)) 
+    return 1;
+  return rule1.compare(&rule2);
+}
+
+string generateTokenNotIn(const string&, const vector<string>);
+
+// sort rules by this order:
+// LHS
+// longest prefix
+// RHS
+
+void sortRulesByMatch(ContextFreeGrammar* grammar) {
+  vector<Rule> rules = grammar->rules;
+  sortRules(&grammar->rules);
+  for (int i = 0; i < rules.size(); i++) {
+    Rule temp;
+    for (int j = i+1; j < rules.size(); j++) {
+      if (compareByLongestMatch(grammar, rules[i], rules[j]) < 0) {
+        cout << "! swap\n";
+        temp = grammar->rules[j];
+        grammar->rules[j] = grammar->rules[i];
+        grammar->rules[i] = temp;
+        continue;
+      }
+    }
+  }
+}
+
+void debug() {
+  sortRules(&cfg.rules);
+  cfg.Print();
+  sortRulesByMatch(&cfg);
+  cfg.Print();
+
+}
+
+string generateNewTokenNotIn(const string& nonterm, const vector<string>& nonterminals) {
+  string A_new;
+  for (int k = 1; k < 100; k++) {
+    A_new  = nonterm  + to_string(k);
+    if (!(vecContains(nonterminals, A_new))) {
+      break;
+    }
+  }
+  return A_new;
+}
+
 
 
 void vecRemoveItem(vector<Rule> *rules, Rule rule) {
@@ -152,7 +169,6 @@ void vecRemoveItem(vector<Rule> *rules, Rule rule) {
 // end helpers
 //////////////////////////////////////////////
 
-ContextFreeGrammar cfg;
 
 // read grammar
 void ReadGrammar() {
@@ -194,101 +210,18 @@ void Task4()
 // Task 5: left factoring
 void Task5()
 {  
-  ContextFreeGrammar cfg_prime;
-  // hoping these clone the vectors
-  cfg_prime.terminals = cfg.terminals;
-
-  vector<string> operatingNonterminals = cfg.nonterminals;
-  int step_count = 0;
-
-  while (!cfg.nonterminals.empty()) {
-    for (string nonterm : cfg.nonterminals) {
-      if (DEBUGGING)
-        cout << "starting nonterm: " << nonterm  << endl;
-      vector<string> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
-
-      if (prefix.size() > 0) {
-        if(DEBUGGING) {
-          cout << "prefix exist! \nlen:" << prefix.size() << "\n";
-          cout<< "Prefix:\n\t";
-          for (string t : prefix) {
-            cout << t  << ", ";
-          }
-          cout<<endl;
-        }
-
-        // remove rules with prefix
-        vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
-
-        // add rule (prefix)(newTok)
-
-        string newTok;
-        for (int k = 1; k < 10; k++) {
-          newTok  = nonterm  + to_string(k);
-          if (!(vecContains(cfg_prime.nonterminals, newTok))) {
-            break;
-          }
-        }
-
-        cfg_prime.nonterminals.push_back(newTok);
-
-        Rule condensedRule = Rule(nonterm, prefix);
-        condensedRule.RHS.push_back(newTok);
-        cfg.rules.push_back(condensedRule);
-
-        // add rules with new prefix
-        for (Rule rule : withPrefix) {
-          rule.LHS = newTok;
-          rule.cutBeginning(prefix.size());
-          cfg_prime.rules.push_back(rule);
-        }
-        if(DEBUGGING) {
-          cout << "New rules:\n";
-          for (Rule r : cfg.rules) {
-            cout << "> rl: ";
-            r.Print();
-          }
-        }
-      }
-      else {
-        // No left factoring possible!!
-        // Remove rules with nonterm 
-        // add to cfg_prime.rules
-        for (Rule rule : cfg.popRulesWith(nonterm)) {
-          cfg_prime.rules.push_back(rule);
-        }
-        // Remove nonterm from Nonterminals and move to cfg_prime.nonterminals
-        if(DEBUGGING) {
-          cout << "Before copying nonterms\n";
-          for (string tok : operatingNonterminals) {
-            cout << "> nt: " << tok  << "\n";
-          }
-        }
-        cfg_prime.nonterminals.push_back(nonterm);
-        vector<string> newNonterm;
-        for (string nt : operatingNonterminals) {
-          if (nt  != nonterm )
-            newNonterm.push_back(nt);
-        }
-        operatingNonterminals = newNonterm;
-        if (DEBUGGING)
-          cout << "Removed nonterm " << nonterm  << "\n";
-      } // end else
-    } // for(nonterm in nonterminal)
-    cfg.nonterminals = operatingNonterminals;
-
-    if (DEBUGGING) {
-      cout << "**after iteration " << ++step_count << endl;
-      for (Rule rule : cfg_prime.rules) {
-        rule.Print();
-      }
+  vector<string> newNonterminals;
+  for(string nonterm : cfg.nonterminals) {
+    bool changeMade = false;
+    while (true) {
+      sortRulesByMatch(&cfg);
+      cfg.Print();
+      // cfg.getRulesWith(nonterm);
+      // for (Rule r :cfg.getRulesWith(nonterm)){
+      //   r.Print();
+      // };
+      break;
     }
-
-  } // end while
-
-  sortRules(&cfg_prime.rules);
-  for (Rule rule : cfg_prime.rules) {
-    rule.Print();
   }
 }
 
@@ -363,14 +296,14 @@ void eliminateDirectRecursion(
   // }
 
   // generate new token
-  string A_new;
-  for (int k = 1; k < 10; k++) {
-    A_new  = A_i  + to_string(k);
-    if (!(vecContains(grammar->nonterminals, A_new))) {
-      //grammar->nonterminals.push_back(newTok);
-      break;
-    }
-  }
+  string A_new = generateNewTokenNotIn(A_i, grammar->nonterminals);
+  // for (int k = 1; k < 100; k++) {
+  //   A_new  = A_i  + to_string(k);
+  //   if (!(vecContains(grammar->nonterminals, A_new))) {
+  //     //grammar->nonterminals.push_back(newTok);
+  //     break;
+  //   }
+  // }
 
   // add null rule
   // A_new -> null
@@ -508,6 +441,10 @@ int main (int argc, char* argv[])
             break;
         
         case 6: Task6();
+            break;
+          
+            // debugging
+        case 7: debug();
             break;
 
         default:

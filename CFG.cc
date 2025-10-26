@@ -591,6 +591,56 @@ void ContextFreeGrammar::PrintFollow() {
 // Task 5 helpers
 /////////////////////////////////////////////////////////////////////////
 
+// returns all rules with a certain LHS
+vector<Rule> ContextFreeGrammar::getRulesWith(string lhs) const {
+  vector<Rule> ret;
+
+  for (Rule rule : rules) {
+    if (rule.LHS == lhs) {
+      ret.push_back(rule);
+    }
+  }
+
+  return ret;
+}
+
+// returns all rules with a certain LHS
+vector<Rule> ContextFreeGrammar::popRulesWith(string lhs) {
+  vector<Rule> ret;
+  vector<Rule> newRules;
+
+  for (Rule rule : rules) {
+    if (rule.LHS == lhs) {
+      ret.push_back(rule);
+    }
+    else {
+      newRules.push_back(rule);
+    }
+  }
+
+  rules = newRules;
+  return ret;
+}
+
+vector<Rule> ContextFreeGrammar::popRulesWithPrefix(string lhs, vector<string> prefix) {
+  vector<Rule> ret;
+  vector<Rule> newRules;
+
+  for (Rule rule : rules) {
+    if ((rule.LHS  == lhs ) && (rule.hasPrefix(prefix))) {
+      ret.push_back(rule);
+    }
+    else {
+      newRules.push_back(rule);
+    }
+  }
+
+  rules = newRules;
+  return ret;
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////
 // rule stuff
 /////////////////////////////////////////////////////////////////////////

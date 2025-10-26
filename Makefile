@@ -31,10 +31,11 @@ test6:
 	make it 
 	./a.out < tests/test15.txt 6
 
-testOrder:
+debug:
 	rm -f ./a.out*
 	make it 
-	./a.out < tests/test14.txt 6
+	./a.out < tests/test12.txt 7
+# ./a.out < tests/test16.txt 7
 
 fulltest:
 	make it 

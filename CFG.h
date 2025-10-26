@@ -3,7 +3,7 @@
 
 #include <cctype>
 using namespace std;
-static const bool DEBUGGING = false;
+static const bool DEBUGGING = true;
 
 class Rule {
 public: 
@@ -142,7 +142,7 @@ public:
 
   // helpers 
 
-  vector<Rule> getRulesWith(string);
+  vector<Rule> getRulesWith(string) const;
   vector<Rule> popRulesWith(string);
   vector<Rule> popRulesWithPrefix(string, vector<string>);
 
