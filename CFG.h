@@ -1,6 +1,7 @@
 #ifndef __CFG__H__
 #define __CFG__H__
 
+#include <cctype>
 using namespace std;
 static const bool DEBUGGING = false;
 
@@ -15,20 +16,38 @@ public:
   string LHS; 
   vector<string> RHS;
 
-  int compare(const Rule *other) {
+  static int compareStrings(string before, string after) {
+    for (int i = 0; i < before.size() && i < after.size(); i++) {
+      if (tolower(before[i]) < tolower(after[i])) {
+        return -1;
+      }
+      if (tolower(before[i]) > tolower(after[i])) {
+        return 1;
+      }
+    }
 
-    if ((other->LHS .compare(this->LHS ) < 0)) {
+    if (before.size() < after.size()) {
       return -1;
     }
-    else if ((other->LHS .compare(this->LHS ) > 0)) {
+    if (before.size() > after.size()) {
+      return 1;
+    }
+    return 0;
+  }
+
+  int compare(const Rule *other) {
+    if (compareStrings(other->LHS, this->LHS) < 0) {
+      return -1;
+    }
+    if (compareStrings(other->LHS, this->LHS) > 0) {
       return 1;
     }
 
     for (int i = 0; i < other->RHS.size() && i < this->RHS.size(); i++) {
-      if ((other->RHS.at(i) .compare(this->RHS.at(i) ) < 0)) {
+      if (compareStrings(other->RHS[i], this->RHS[i]) < 0) {
         return -1;
       }
-      else if ((other->RHS.at(i) .compare(this->RHS.at(i) ) > 0)) {
+      if (compareStrings(other->RHS[i], this->RHS[i]) > 0) {
         return 1;
       }
     }

@@ -335,18 +335,40 @@ void eliminateDirectRecursion(
   vector<Rule> offendingRules = grammar->popRulesWithPrefix(A_i, {A_i});
   vector<Rule> substitutionRules = grammar->getRulesWith(A_i);
 
-  for (Rule offender : offendingRules) {
-    for (Rule substitution : substitutionRules) {
-      // make offender Ai -> Aj alpha
-      // Ai -> delta alpha
-      // where Aj -> delta
-      // cout << "Substituting[\n";
-      // substitution.Print();
-      // offender.Print();
-      // cout << "]\n";
-      grammar->rules.push_back(substituteStartWith(offender, substitution));
-      // grammar->Print();
+  if (offendingRules.size() == 0) {
+    return;
+  }
+
+  // generate new token
+  string A_new;
+  for (int k = 1; k < 10; k++) {
+    A_new  = A_i  + to_string(k);
+    if (!(vecContains(grammar->nonterminals, A_new))) {
+      //grammar->nonterminals.push_back(newTok);
+      break;
     }
+  }
+
+  // add null rule
+  // A_new -> null
+  grammar->rules.push_back(Rule(A_new, vector<string>()));
+
+  // the form A_i -> A_i (alpha)
+  // to
+  // A_new -> alpha A_new
+  for (Rule offender : offendingRules) {
+    offender.cutBeginning(1);
+    offender.LHS = A_new;
+    offender.RHS.push_back(A_new);
+    grammar->rules.push_back(offender);
+  }
+
+  // the form A_i -> (beta)
+  // to 
+  // A_i -> (beta) (A_new)
+  for (Rule substitution : substitutionRules) {
+    substitution.RHS.push_back(A_new);
+    grammar->rules.push_back(substitution);
   }
   sortRules(&grammar->rules);
 }
@@ -365,7 +387,7 @@ void Task6()
     }
   }
   sortRules(&cfg.rules);
-  cfg.PrintTokens();
+  //cfg.PrintTokens();
 
 
   // indirect left recursion, no rule can start with a rule before

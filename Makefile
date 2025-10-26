@@ -29,7 +29,7 @@ test5:
 test6:
 	rm -f ./a.out*
 	make it 
-	./a.out < tests/test13.txt 6
+	./a.out < tests/test15.txt 6
 
 testOrder:
 	rm -f ./a.out*
