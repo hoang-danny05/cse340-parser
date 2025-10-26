@@ -281,7 +281,7 @@ void Task5()
 
 Rule substituteStartWith(const Rule&, const Rule&);
 void eliminateIndirectRecursion(string, string, ContextFreeGrammar*);
-//void eliminateDirectRecursion();
+void eliminateDirectRecursion(string, ContextFreeGrammar*);
 
 Rule substituteStartWith(const Rule& replacee, const Rule& replacer) {
   if (replacee.RHS.size() < 1)
@@ -301,14 +301,14 @@ void eliminateIndirectRecursion(
   vector<Rule> offendingRules = grammar->popRulesWithPrefix(A_i, {A_j});
   vector<Rule> substitutionRules = grammar-> getRulesWith(A_j);
 
-  cout << "OFFENDER\n";
-  for (Rule offender : offendingRules) {
-    offender.Print();
-  }
-  cout << "SUBBER\n";
-  for (Rule offender : substitutionRules) {
-    offender.Print();
-  }
+  // cout << "OFFENDER\n";
+  // for (Rule offender : offendingRules) {
+  //   offender.Print();
+  // }
+  // cout << "SUBBER\n";
+  // for (Rule offender : substitutionRules) {
+  //   offender.Print();
+  // }
 
 
 
@@ -317,12 +317,35 @@ void eliminateIndirectRecursion(
       // make offender Ai -> Aj alpha
       // Ai -> delta alpha
       // where Aj -> delta
-      cout << "Substituting[\n";
-      substitution.Print();
-      offender.Print();
-      cout << "]\n";
+      // cout << "Substituting[\n";
+      // substitution.Print();
+      // offender.Print();
+      // cout << "]\n";
       grammar->rules.push_back(substituteStartWith(offender, substitution));
-      grammar->Print();
+      // grammar->Print();
+    }
+  }
+  sortRules(&grammar->rules);
+}
+
+void eliminateDirectRecursion(
+  string A_i,
+  ContextFreeGrammar* grammar
+) {
+  vector<Rule> offendingRules = grammar->popRulesWithPrefix(A_i, {A_i});
+  vector<Rule> substitutionRules = grammar->getRulesWith(A_i);
+
+  for (Rule offender : offendingRules) {
+    for (Rule substitution : substitutionRules) {
+      // make offender Ai -> Aj alpha
+      // Ai -> delta alpha
+      // where Aj -> delta
+      // cout << "Substituting[\n";
+      // substitution.Print();
+      // offender.Print();
+      // cout << "]\n";
+      grammar->rules.push_back(substituteStartWith(offender, substitution));
+      // grammar->Print();
     }
   }
   sortRules(&grammar->rules);
@@ -345,7 +368,6 @@ void Task6()
   cfg.PrintTokens();
 
 
-  cfg.Print();
   // indirect left recursion, no rule can start with a rule before
   for (int i = 0; i < cfg.nonterminals.size(); i++) {
     for (int j = 0; j < i; j++) {
@@ -355,7 +377,12 @@ void Task6()
         &cfg
       );
     }
+    eliminateDirectRecursion(
+      cfg.nonterminals[i],
+      &cfg
+    );
   }
+
   cfg.Print();
 
 

@@ -75,10 +75,12 @@ void ContextFreeGrammar::readGrammar() {
 }
 
 void ContextFreeGrammar::Print() {
-  cout << "total rules: "<< rules.size() << "  \n";
-  cout << "###############################################\n";
-  cout << "DISPLAYING CFG: \n";
-  cout << "###############################################\n";
+  if (DEBUGGING) {
+    cout << "total rules: "<< rules.size() << "  \n";
+    cout << "###############################################\n";
+    cout << "DISPLAYING CFG: \n";
+    cout << "###############################################\n";
+  }
   for (int i = 0; i < rules.size(); i++) {
     rules.at(i).Print();
   }
