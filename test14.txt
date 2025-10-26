@@ -1,0 +1,5 @@
+A -> AA B A *
+A -> A B A *
+A -> A B *
+B -> A * 
+#

@@ -62,6 +62,17 @@ public:
     return ret;
   }
 
+  int lengthCommonPrefixWith(const Rule& other) {
+    for (int i = 0; i < this->RHS.size() && i < other.RHS.size(); i++) {
+      if (this->RHS[i] == other.RHS[i]) {
+        continue;
+      } else {
+        return i;
+      }
+    }
+    return 0;
+  }
+
 private:
   string tmp;
 };
