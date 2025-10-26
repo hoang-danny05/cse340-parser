@@ -3,7 +3,7 @@
 
 #include <cctype>
 using namespace std;
-static const bool DEBUGGING = false;
+static const bool DEBUGGING = true;
 
 class Rule {
 public: 

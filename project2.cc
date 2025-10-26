@@ -257,6 +257,7 @@ void Task5()
     bool changeMade = false;
     while (true) {
       sortRulesByMatch(&cfg);
+      cfg.Print();
       const vector<Rule> rulesToCheck = cfg.getRulesWith(nonterm);
       if (rulesToCheck.size() == 0) {
         break;

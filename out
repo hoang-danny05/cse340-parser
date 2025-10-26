@@ -3,280 +3,126 @@ make it
 make[1]: Entering directory '/home/danny/ASU/cse340-parser'
 g++ project2.cc lexer.cc inputbuf.cc CFG.cc
 make[1]: Leaving directory '/home/danny/ASU/cse340-parser'
-./a.out < tests/test16.txt 7
+./a.out < tests/test17.txt 5
 
 Adding terminated rule
-A -> A B C D #
+S -> C B C D A B C #
 
 Adding terminated rule
-B -> A B C D #
+A -> C B C D #
 
 Adding terminated rule
-A -> A B D E #
+A -> C B C B #
 
 Adding terminated rule
-A -> C D E #
+A -> C B D #
 
 Adding terminated rule
-B -> A C D #
+A -> C B B #
 
 Adding terminated rule
-B -> A C E #
+B -> b #
 
 Adding terminated rule
-A -> E C E #
+C -> c #
 
 Adding terminated rule
-A -> F G E #
-
-Adding terminated rule
-A -> F G F #
-Final Size:9
+D -> d #
+Final Size:8
 Initialize map
 Initial map terminals
 Starting complex loop 
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Terminal found: C
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Terminal found: E
-Terminal found: F
-Terminal found: F
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Terminal found: b
+Terminal found: c
+Terminal found: d
 Next FIRST Loop
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Terminal found: C
-Non-Nullable nonterm: A
-Non-Nullable nonterm: A
-Terminal found: E
-Terminal found: F
-Terminal found: F
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Non-Nullable nonterm: C
+Terminal found: b
+Terminal found: c
+Terminal found: d
 Ending FIRST Loops
 follow: Initialize map
 Starting complex loop 
+Next FOLLOW Loop
 Ending FOLLOW Loops
-total rules: 9  
+total rules: 8  
 ###############################################
 DISPLAYING CFG: 
 ###############################################
-A -> A B C D #
-A -> A B D E #
-A -> C D E #
-A -> E C E #
-A -> F G E #
-A -> F G F #
-B -> A B C D #
-B -> A C D #
-B -> A C E #
-comp: [
-A -> A B C D #
-A -> A B D E #
-]
-comp: [
-A -> A B C D #
-A -> C D E #
-]
-comp: [
-A -> A B C D #
-A -> E C E #
-]
-comp: [
-A -> A B C D #
-A -> F G E #
-]
-comp: [
-A -> A B C D #
-A -> F G F #
-]
-comp: [
-A -> A B C D #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> A B C D #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> A B C D #
-B -> A C E #
-]
-after!
-
-comp: [
-A -> A B D E #
-A -> C D E #
-]
-comp: [
-A -> A B D E #
-A -> E C E #
-]
-comp: [
-A -> A B D E #
-A -> F G E #
-]
-comp: [
-A -> A B D E #
-A -> F G F #
-]
-comp: [
-A -> A B D E #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> A B D E #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> A B D E #
-B -> A C E #
-]
-after!
-
-comp: [
-A -> C D E #
-A -> E C E #
-]
-comp: [
-A -> C D E #
-A -> F G E #
-]
-! swap
-comp: [
-A -> C D E #
-A -> F G F #
-]
-! swap
-comp: [
-A -> C D E #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> C D E #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> C D E #
-B -> A C E #
-]
-after!
-
-comp: [
-A -> E C E #
-A -> F G E #
-]
-! swap
-comp: [
-A -> E C E #
-A -> F G F #
-]
-! swap
-comp: [
-A -> E C E #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> E C E #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> E C E #
-B -> A C E #
-]
-after!
-
-comp: [
-A -> F G E #
-A -> F G F #
-]
-comp: [
-A -> F G E #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> F G E #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> F G E #
-B -> A C E #
-]
-after!
-
-comp: [
-A -> F G F #
-B -> A B C D #
-]
-after!
-
-comp: [
-A -> F G F #
-B -> A C D #
-]
-after!
-
-comp: [
-A -> F G F #
-B -> A C E #
-]
-after!
-
-comp: [
-B -> A B C D #
-B -> A C D #
-]
-! swap
-comp: [
-B -> A B C D #
-B -> A C E #
-]
-! swap
-comp: [
-B -> A C D #
-B -> A C E #
-]
-total rules: 9  
+A -> C B C D #
+A -> C B C B #
+A -> C B B #
+A -> C B D #
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #
+total rules: 7  
 ###############################################
 DISPLAYING CFG: 
 ###############################################
-A -> A B C D #
-A -> A B D E #
-A -> F G F #
-A -> F G E #
-A -> E C E #
-A -> C D E #
-B -> A C E #
-B -> A B C D #
-B -> A C D #
-
-A -> A B C D #
-A -> A B D E #
-A -> C D E #
-A -> E C E #
-A -> F G E #
-A -> F G F #
-B -> A B C D #
-B -> A C D #
-B -> A C E #
+A -> C B B #
+A -> C B C A1 #
+A -> C B D #
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #
+total rules: 5  
+###############################################
+DISPLAYING CFG: 
+###############################################
+A -> C B A2 #
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #
+total rules: 4  
+###############################################
+DISPLAYING CFG: 
+###############################################
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #
+total rules: 3  
+###############################################
+DISPLAYING CFG: 
+###############################################
+C -> c #
+D -> d #
+S -> C B C D A B C #
+total rules: 2  
+###############################################
+DISPLAYING CFG: 
+###############################################
+D -> d #
+S -> C B C D A B C #
+total rules: 1  
+###############################################
+DISPLAYING CFG: 
+###############################################
+S -> C B C D A B C #
+total rules: 10  
+###############################################
+DISPLAYING CFG: 
+###############################################
+A -> C B A2 #
+A1 -> B #
+A1 -> D #
+A2 -> B #
+A2 -> C A1 #
+A2 -> D #
+B -> b #
+C -> c #
+D -> d #
+S -> C B C D A B C #
