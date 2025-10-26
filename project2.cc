@@ -89,27 +89,27 @@ int longest_match(const ContextFreeGrammar* grammar, const Rule rule) {
   return longestMatch;
 }
 
-// <1 if rule1 is before
-// >1 if rule1 is after
-int compareByLongestMatch(ContextFreeGrammar* grammar, Rule rule1, Rule rule2) {
-  cout << "comp: [\n";
-  rule1.Print();
-  rule2.Print();
-  cout  << "]\n";
-  if (rule1.LHS.compare(rule2.LHS) > 0) {
-    cout << "before!\n\n";
-    return -1;
-  }
-  if (rule1.LHS.compare(rule2.LHS) < 0) {
-    cout << "after!\n\n";
-    return 1;
-  }
-  if (longest_match(grammar, rule1) < longest_match(grammar, rule2)) 
-    return -1;
-  if (longest_match(grammar, rule1) > longest_match(grammar, rule2)) 
-    return 1;
-  return rule1.compare(&rule2);
-}
+// // <1 if rule1 is before
+// // >1 if rule1 is after
+// int compareByLongestMatch(ContextFreeGrammar* grammar, Rule rule1, Rule rule2) {
+//   cout << "comp: [\n";
+//   rule1.Print();
+//   rule2.Print();
+//   cout  << "]\n";
+//   if (rule1.LHS.compare(rule2.LHS) > 0) {
+//     cout << "before!\n\n";
+//     return -1;
+//   }
+//   if (rule1.LHS.compare(rule2.LHS) < 0) {
+//     cout << "after!\n\n";
+//     return 1;
+//   }
+//   if (longest_match(grammar, rule1) < longest_match(grammar, rule2)) 
+//     return -1;
+//   if (longest_match(grammar, rule1) > longest_match(grammar, rule2)) 
+//     return 1;
+//   return rule1.compare(&rule2);
+// }
 
 string generateTokenNotIn(const string&, const vector<string>);
 
@@ -121,7 +121,7 @@ string generateTokenNotIn(const string&, const vector<string>);
 void sortRulesByMatch(ContextFreeGrammar* grammar) {
   vector<Rule> rules = grammar->rules;
   //sort by lexicographic order
-  sortRules(&grammar->rules);
+  sortRules2(&grammar->rules);
   
   // sort by the longest prefix
   for (int i = 1; i < grammar->rules.size(); ++i) {
@@ -278,7 +278,7 @@ void Task5()
       vector<Rule> commonPrefixRules = cfg.popRulesWithPrefix(nonterm, prefix);
       for (Rule r : commonPrefixRules) {
         r.LHS = newTok;
-        cfg_prime.rules.push_back(r.substitutePrefix(prefixLen, {newTok}));
+        cfg_prime.rules.push_back(r.substitutePrefix(prefixLen, {}));
       }
       // cout << "hello?\n";
 
