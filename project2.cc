@@ -250,18 +250,52 @@ void Task4()
 void Task5()
 {  
   vector<string> newNonterminals;
+  ContextFreeGrammar cfg_prime;
+  cfg.sortNonterminals();
+
   for(string nonterm : cfg.nonterminals) {
     bool changeMade = false;
     while (true) {
       sortRulesByMatch(&cfg);
-      cfg.Print();
-      // cfg.getRulesWith(nonterm);
-      // for (Rule r :cfg.getRulesWith(nonterm)){
-      //   r.Print();
-      // };
-      break;
+      const vector<Rule> rulesToCheck = cfg.getRulesWith(nonterm);
+      if (rulesToCheck.size() == 0) {
+        break;
+      }
+
+      int prefixLen = longest_match(&cfg, rulesToCheck[0]);
+
+      if (prefixLen == 0) { // no common prefix!
+        for (Rule r : cfg.popRulesWith(nonterm))
+          cfg_prime.rules.push_back(r);
+        break;
+      }
+
+      vector<string> prefix = rulesToCheck[0].getPrefix(prefixLen);
+      string newTok = generateNewTokenNotIn(nonterm, cfg.nonterminals);
+      //cout << "NEWTOK:" << newTok << endl;
+      cfg.nonterminals.push_back(newTok);
+
+      vector<Rule> commonPrefixRules = cfg.popRulesWithPrefix(nonterm, prefix);
+      for (Rule r : commonPrefixRules) {
+        r.LHS = newTok;
+        cfg_prime.rules.push_back(r.substitutePrefix(prefixLen, {newTok}));
+      }
+      // cout << "hello?\n";
+
+
+      // cout << "Nonterm:" << nonterm << endl;
+      // for (Rule rule : cfg.getRulesWith(nonterm))
+      //   rule.Print();
+      
+      // Rule (A) -> (prefix) (A_new)
+      Rule newRule = Rule(nonterm, prefix) ;
+      newRule.RHS.push_back(newTok);
+      cfg.rules.push_back(newRule);
     }
   }
+  cfg_prime.nonterminals = cfg.nonterminals;
+  sortRules(&cfg_prime.rules);
+  cfg_prime.Print();
 }
 
 Rule substituteStartWith(const Rule&, const Rule&);
@@ -352,7 +386,7 @@ void eliminateDirectRecursion(
   // to
   // A_new -> alpha A_new
   for (Rule offender : offendingRules) {
-    offender.cutBeginning(1);
+    offender.extractPrefix(1);
     offender.LHS = A_new;
     offender.RHS.push_back(A_new);
     grammar->rules.push_back(offender);

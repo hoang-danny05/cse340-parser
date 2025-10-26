@@ -687,13 +687,12 @@ bool Rule::hasPrefix(vector<string> prefix){
 }
 
 Rule Rule::substitutePrefix(int prefixLen, vector<string> substitution) {
-  Rule newRule;
   if (this->RHS.size() < prefixLen)
     std::exit(1); 
   for (int i = prefixLen; i < this->RHS.size(); i++){
-    substitution.push_back(newRule.RHS[i]);
+    substitution.push_back(this->RHS[i]);
   }
-  newRule.RHS = substitution;
+  Rule newRule = Rule(this->LHS, substitution);
   return newRule;
 }
 

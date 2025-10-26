@@ -3,7 +3,7 @@
 
 #include <cctype>
 using namespace std;
-static const bool DEBUGGING = true;
+static const bool DEBUGGING = false;
 
 class Rule {
 public: 
@@ -80,13 +80,28 @@ public:
     }
     return (other->RHS.size() > this->RHS.size());
   }
-  void cutBeginning(int cutLength) {
+
+  vector<string> getPrefix(int cutLength) const {
+    //cout << "len: " << cutLength << endl;
+    vector<string> ret;
+    for (int i = 0; i < cutLength; i++) {
+      ret.push_back(RHS[i]);
+    }
+    return ret;
+  }
+
+  vector<string> extractPrefix(int cutLength) {
     //cout << "len: " << cutLength << endl;
     vector<string> newRHS;
+    vector<string> ret;
+    for (int i = 0; i < cutLength; i++) {
+      ret.push_back(RHS[i]);
+    }
     for (int i = cutLength; i < RHS.size(); i++) {
       newRHS.push_back(RHS[i]);
     }
     RHS = newRHS;
+    return ret;
   }
 
   Rule substitutePrefix(int, vector<string>);
@@ -145,6 +160,18 @@ public:
   vector<Rule> getRulesWith(string) const;
   vector<Rule> popRulesWith(string);
   vector<Rule> popRulesWithPrefix(string, vector<string>);
+
+  void sortNonterminals() {
+    for (int i = 0; i < nonterminals.size(); i++) {
+      for (int j = 0; j < nonterminals.size(); j++) {
+        if(nonterminals[i].compare(nonterminals[j]) < 0) {
+          string tmp = nonterminals[i];
+          nonterminals[i] = nonterminals[j];
+          nonterminals[j] = tmp;
+        }
+      }
+    }
+  }
 
   static bool vecContains(vector<string> vec, string item) {
     for(int i = 0; i < vec.size(); i++) {
