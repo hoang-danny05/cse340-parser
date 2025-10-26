@@ -333,11 +333,21 @@ void eliminateDirectRecursion(
   ContextFreeGrammar* grammar
 ) {
   vector<Rule> offendingRules = grammar->popRulesWithPrefix(A_i, {A_i});
-  vector<Rule> substitutionRules = grammar->getRulesWith(A_i);
 
   if (offendingRules.size() == 0) {
     return;
   }
+
+  vector<Rule> substitutionRules = grammar->popRulesWith(A_i);
+
+  // cout << "OFFENDER\n";
+  // for (Rule offender : offendingRules) {
+  //   offender.Print();
+  // }
+  // cout << "SUSTITUTER:\n";
+  // for (Rule offender : substitutionRules) {
+  //   offender.Print();
+  // }
 
   // generate new token
   string A_new;
