@@ -20,14 +20,12 @@ void throwException() {
 
 void ContextFreeGrammar::readGrammar() {
   LexicalAnalyzer lexer = LexicalAnalyzer();
+  Token temp;
 
   // for each start of line 
   for (Token peek = lexer.peek(1);(peek.token_type == ID);peek = lexer.peek(1))
   {
-    if (peek.token_type == ERROR) {
-      throwException();
-    }
-
+    
     string LHS = lexer.GetToken().lexeme;
     vector<string> RHS = vector<string>();
     
@@ -37,9 +35,9 @@ void ContextFreeGrammar::readGrammar() {
 
     while (true) {
       
-      Token tmp = lexer.GetToken();
+      Token temp = lexer.GetToken();
 
-      if (tmp.token_type == STAR) {
+      if (temp.token_type == STAR) {
         Rule rule = Rule(LHS, RHS);
         if (DEBUGGING) {
           cout << "\nAdding terminated rule\n";
@@ -49,7 +47,7 @@ void ContextFreeGrammar::readGrammar() {
         // cout << "Size:"<< rules.size()<< endl;
         break;
       }
-      else if (tmp.token_type == OR) {
+      else if (temp.token_type == OR) {
         Rule rule = Rule(LHS, RHS);
         if (DEBUGGING) {
           cout << "\nAdding OR rule\n";
@@ -59,8 +57,11 @@ void ContextFreeGrammar::readGrammar() {
         RHS = vector<string>();
         //cout << "NEW RHS size:"<< RHS.size()<< endl;
       }
+      else if (temp.token_type == ID){
+        RHS.push_back(temp.lexeme);
+      } 
       else {
-        RHS.push_back(tmp.lexeme);
+        throwException();
       }
     } //end for each OR rule
   } // end for each line
