@@ -294,7 +294,7 @@ void Task5()
     }
   }
   cfg_prime.nonterminals = cfg.nonterminals;
-  sortRules(&cfg_prime.rules);
+  sortRules2(&cfg_prime.rules);
   cfg_prime.Print();
 }
 
