@@ -68,7 +68,7 @@ for test_file in $(find "./tests" -type f -name "*.txt" | sort); do
         echo "${name}: OK"
     fi
     echo "========================================================"
-    #rm -f ${output_file}
+    rm -f ${output_file}
     rm -f ${diff_file}
 done
 
@@ -76,4 +76,8 @@ echo
 echo "Passed $count tests out of $all for task ${taskNumber}"
 echo
 
-rmdir ./output
+if [ $count -ne 12 ]; then 
+    exit 1;
+fi
+
+rm -rf ./output

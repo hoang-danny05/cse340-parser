@@ -14,11 +14,8 @@
 
 using namespace std;
 
-bool DEBUGGING = false;
-
 // Lexer modified for FIRST & FOLLOW project
 
-//                      0              1       2       3       4    5         6
 string reserved[] = { "END_OF_FILE", "ARROW", "STAR", "HASH", "ID", "ERROR", "OR" };
 
 void Token::Print()
@@ -105,8 +102,6 @@ Token LexicalAnalyzer::GetToken()
     else{
         token = tokenList[index];
         index = index + 1;
-        if (DEBUGGING)
-          cout << "> got: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
     }
     return token;
 }
@@ -125,15 +120,9 @@ Token LexicalAnalyzer::peek(int howFar)
         token.lexeme = "";
         token.line_no = line_no;
         token.token_type = END_OF_FILE;
-        if (DEBUGGING)
-          cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
         return token;
-    } else {
-        Token token = tokenList[peekIndex];
-        if (DEBUGGING)
-          cout << "> peek: Index[" << index << "] type=["<< token.token_type <<"] lexeme=[" << token.lexeme << "].\n"; 
+    } else
         return tokenList[peekIndex];
-    }
 }
 
 Token LexicalAnalyzer::GetTokenMain()
