@@ -120,23 +120,62 @@ string generateTokenNotIn(const string&, const vector<string>);
 
 void sortRulesByMatch(ContextFreeGrammar* grammar) {
   vector<Rule> rules = grammar->rules;
+  //sort by lexicographic order
   sortRules(&grammar->rules);
-  for (int i = 0; i < rules.size(); i++) {
-    Rule temp;
-    for (int j = i+1; j < rules.size(); j++) {
-      if (compareByLongestMatch(grammar, rules[i], rules[j]) < 0) {
-        cout << "! swap\n";
-        temp = grammar->rules[j];
-        grammar->rules[j] = grammar->rules[i];
-        grammar->rules[i] = temp;
-        continue;
-      }
+  
+  // sort by the longest prefix
+  for (int i = 1; i < grammar->rules.size(); ++i) {
+    Rule item = grammar->rules[i];
+    int key = longest_match(grammar, item);
+    int j = i - 1;
+    // while (j >= 0 && arr[j] > key) {
+    //                  arr(j) goes after key
+    // cout << "Sort by longest match of:" << endl;
+    // grammar->rules[i].Print();
+    // grammar->rules[j].Print();
+    // cout<< longest_match(grammar, grammar->rules[j]), "\n\n";
+    for (; j >= 0 && longest_match(grammar, grammar->rules[j]) < longest_match(grammar, item); j--) {
+      // cout<<"Shift left\n";
+      grammar->rules[j+1] = grammar->rules[j];
     }
+    // arr[j + 1] = key;
+    grammar->rules[j+1] = item;
   }
+
+  // grammar->Print();
+
+  // sort by LHS
+  for (int i = 1; i < grammar->rules.size(); ++i) {
+    Rule item = grammar->rules[i];
+    string key = item.LHS;
+    int j = i - 1;
+
+    // while (j >= 0 && arr[j] > key) {
+    //                  arr(j) goes after key
+    for (; j >= 0 && grammar->rules[j].LHS.compare(key) > 0; j--) {
+        // arr[j + 1] = arr[j];
+        grammar->rules[j+1] = grammar->rules[j];
+    }
+    // arr[j + 1] = key;
+    grammar->rules[j+1] = item;
+  }
+
+  // for (int i = 0; i < rules.size(); i++) {
+  //   Rule temp;
+  //   for (int j = i+1; j < rules.size(); j++) {
+  //     if (compareByLongestMatch(grammar, rules[i], rules[j]) < 0) {
+  //       cout << "! swap\n";
+  //       temp = grammar->rules[j];
+  //       grammar->rules[j] = grammar->rules[i];
+  //       grammar->rules[i] = temp;
+  //       continue;
+  //     }
+  //   }
+  // }
+
 }
 
 void debug() {
-  sortRules(&cfg.rules);
   cfg.Print();
   sortRulesByMatch(&cfg);
   cfg.Print();

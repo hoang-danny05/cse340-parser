@@ -34,8 +34,8 @@ test6:
 debug:
 	rm -f ./a.out*
 	make it 
-	./a.out < tests/test12.txt 7
-# ./a.out < tests/test16.txt 7
+	#./a.out < tests/test12.txt 7
+	./a.out < tests/test16.txt 7
 
 fulltest:
 	make it 
