@@ -92,6 +92,19 @@ void sortRules(vector<Rule>* rules) {
   }
 }
 
+void sortRules2(vector<Rule>* rules) {
+  for (int i = 0; i < rules->size(); i++) {
+    Rule temp;
+    for (int j = i+1; j < rules->size(); j++) {
+      if (rules->at(j).compare(&rules->at(i)) > 0) {
+        temp = rules->at(j);
+        rules->at(j) = rules->at(i);
+        rules->at(i) = temp;
+        continue;
+      }
+    }
+  }
+}
 
 vector<string> longestCommonPrefix(const vector<Rule>& vecs) 
 {
@@ -414,7 +427,7 @@ void Task6()
       &cfg
     );
   }
-
+  sortRules2(&cfg.rules);
   cfg.Print();
 
 

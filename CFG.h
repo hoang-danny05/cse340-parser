@@ -58,6 +58,28 @@ public:
     return (other->RHS.size() > this->RHS.size());
   }
 
+  int compare2(const Rule *other) {
+    if (other->LHS.compare(this->LHS) < 0) {
+      return -1;
+    }
+    if (other->LHS.compare(this->LHS) > 0) {
+      return 1;
+    }
+
+    for (int i = 0; i < other->RHS.size() && i < this->RHS.size(); i++) {
+      if (other->RHS[i].compare(this->RHS[i]) < 0) {
+        return -1;
+      }
+      if (other->RHS[i].compare(this->RHS[i]) > 0) {
+        return 1;
+      }
+    }
+
+    if (this->RHS.size() == other->RHS.size()) {
+      return 0;
+    }
+    return (other->RHS.size() > this->RHS.size());
+  }
   void cutBeginning(int cutLength) {
     //cout << "len: " << cutLength << endl;
     vector<string> newRHS;
