@@ -19,7 +19,7 @@ using namespace std;
 // Task 5 helpers
 //////////////////////////////////////////////
 
-bool vecContains(std::vector<string> vec, string item) {
+bool vecContains(vector<string> vec, string item) {
   for(int i = 0; i < vec.size(); i++) {
     if (vec.at(i)  == item )
       return true;
@@ -31,8 +31,8 @@ bool vecContains(std::vector<string> vec, string item) {
 // checks lexeme, nothing else!
 
 // returns all rules with a certain LHS
-std::vector<Rule> ContextFreeGrammar::getRulesWith(string lhs) {
-  std::vector<Rule> ret;
+vector<Rule> ContextFreeGrammar::getRulesWith(string lhs) {
+  vector<Rule> ret;
 
   for (Rule rule : rules) {
     if (rule.LHS == lhs) {
@@ -44,9 +44,9 @@ std::vector<Rule> ContextFreeGrammar::getRulesWith(string lhs) {
 }
 
 // returns all rules with a certain LHS
-std::vector<Rule> ContextFreeGrammar::popRulesWith(string lhs) {
-  std::vector<Rule> ret;
-  std::vector<Rule> newRules;
+vector<Rule> ContextFreeGrammar::popRulesWith(string lhs) {
+  vector<Rule> ret;
+  vector<Rule> newRules;
 
   for (Rule rule : rules) {
     if (rule.LHS == lhs) {
@@ -61,9 +61,9 @@ std::vector<Rule> ContextFreeGrammar::popRulesWith(string lhs) {
   return ret;
 }
 
-std::vector<Rule> ContextFreeGrammar::popRulesWithPrefix(string lhs, std::vector<string> prefix) {
-  std::vector<Rule> ret;
-  std::vector<Rule> newRules;
+vector<Rule> ContextFreeGrammar::popRulesWithPrefix(string lhs, vector<string> prefix) {
+  vector<Rule> ret;
+  vector<Rule> newRules;
 
   for (Rule rule : rules) {
     if ((rule.LHS  == lhs ) && (rule.hasPrefix(prefix))) {
@@ -78,7 +78,7 @@ std::vector<Rule> ContextFreeGrammar::popRulesWithPrefix(string lhs, std::vector
   return ret;
 }
 
-void sortRules(std::vector<Rule>* rules) {
+void sortRules(vector<Rule>* rules) {
   for (int i = 0; i < rules->size(); i++) {
     Rule temp;
     for (int j = i+1; j < rules->size(); j++) {
@@ -93,13 +93,13 @@ void sortRules(std::vector<Rule>* rules) {
 }
 
 
-std::vector<string> longestCommonPrefix(const std::vector<Rule>& vecs) 
+vector<string> longestCommonPrefix(const vector<Rule>& vecs) 
 {
-  std::vector<string> prefix;
+  vector<string> prefix;
   
   for (int i = 0; i < vecs.size(); i++) {
     for (int j = i+1; j < vecs.size(); j++) {
-      std::vector<string> candidate;
+      vector<string> candidate;
       Rule rule1 = vecs[i];
       Rule rule2 = vecs[j];
       for (int k = 0; k < rule1.RHS.size() && k < rule2.RHS.size(); k++){
@@ -126,8 +126,8 @@ std::vector<string> longestCommonPrefix(const std::vector<Rule>& vecs)
 /////////////////////////////////////////////////////////////////////////
 
 
-void vecRemoveItem(std::vector<Rule> *rules, Rule rule) {
-  std::vector<Rule> newRules;
+void vecRemoveItem(vector<Rule> *rules, Rule rule) {
+  vector<Rule> newRules;
   for (Rule r : *rules) {
     if(!(rule == r))
       newRules.push_back(r);
@@ -154,7 +154,7 @@ void ReadGrammar() {
 */
 void Task1()
 {
-    cfg.Printstrings();
+    cfg.PrintTokens();
 }
 
 /*
@@ -185,18 +185,18 @@ void Task5()
   // hoping these clone the vectors
   cfg_prime.terminals = cfg.terminals;
 
-  std::vector<string> operatingNonterminals = cfg.nonterminals;
+  vector<string> operatingNonterminals = cfg.nonterminals;
   int step_count = 0;
 
   while (!cfg.nonterminals.empty()) {
     for (string nonterm : cfg.nonterminals) {
       if (DEBUGGING)
-        std::cout << "starting nonterm: " << nonterm  << std::endl;
-      std::vector<string> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
+        cout << "starting nonterm: " << nonterm  << endl;
+      vector<string> prefix = longestCommonPrefix(cfg.getRulesWith(nonterm));
 
       if (prefix.size() > 0) {
         if(DEBUGGING) {
-          std::cout << "prefix exist! \nlen:" << prefix.size() << "\n";
+          cout << "prefix exist! \nlen:" << prefix.size() << "\n";
           cout<< "Prefix:\n\t";
           for (string t : prefix) {
             cout << t  << ", ";
@@ -205,7 +205,7 @@ void Task5()
         }
 
         // remove rules with prefix
-        std::vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
+        vector<Rule> withPrefix = cfg.popRulesWithPrefix(nonterm, prefix);
 
         // add rule (prefix)(newTok)
 

@@ -1,7 +1,0 @@
-DONE
-A -> a A #
-B -> b #
-C -> c #
-S -> A B #
-S -> C #
-S -> a #

@@ -1,8 +1,0 @@
-DONE
-A -> b B C #
-B -> d A #
-C -> c B #
-C -> e B #
-C -> f B x A #
-S -> a B #
-S -> k A #

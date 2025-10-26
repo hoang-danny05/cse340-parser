@@ -40,8 +40,8 @@ public:
   }
 
   void cutBeginning(int cutLength) {
-    //std::cout << "len: " << cutLength << std::endl;
-    std::vector<string> newRHS;
+    //cout << "len: " << cutLength << endl;
+    vector<string> newRHS;
     for (int i = cutLength; i < RHS.size(); i++) {
       newRHS.push_back(RHS[i]);
     }
@@ -52,8 +52,8 @@ public:
     return (this->compare(&other)) == 0;
   }
 
-  std::vector<string> afterPrefix(int prefixLen) {
-    std::vector<string> ret;
+  vector<string> afterPrefix(int prefixLen) {
+    vector<string> ret;
     for (int i = prefixLen; i < RHS.size(); i++) {
       ret.push_back(RHS[i]);
     }
@@ -72,27 +72,27 @@ public:
   void init();
 
   void Print();
-  void Printstrings();
+  void PrintTokens();
   void PrintNullable();
   void PrintFirst();
   void PrintFollow();
 
-  std::vector<Rule> rules;
-  std::vector<string> nonterminals;
-  std::vector<string> terminals;
+  vector<Rule> rules;
+  vector<string> nonterminals;
+  vector<string> terminals;
 
-  std::vector<string> nullable;
+  vector<string> nullable;
 
-  std::map<std::string, std::vector<string>> first;
-  std::map<std::string, std::vector<string>> follow;
+  map<string, vector<string>> first;
+  map<string, vector<string>> follow;
 
   // helpers 
 
-  std::vector<Rule> getRulesWith(string);
-  std::vector<Rule> popRulesWith(string);
-  std::vector<Rule> popRulesWithPrefix(string, std::vector<string>);
+  vector<Rule> getRulesWith(string);
+  vector<Rule> popRulesWith(string);
+  vector<Rule> popRulesWithPrefix(string, vector<string>);
 
-  static bool vecContains(std::vector<string> vec, string item) {
+  static bool vecContains(vector<string> vec, string item) {
     for(int i = 0; i < vec.size(); i++) {
       if (vec.at(i)  == item )
         return true;
@@ -102,7 +102,7 @@ public:
 
 //NOTE: USE THIS AS SET ADDITION, NOTHING ELSE
 // returns changesMade
-static int vecAddTo(std::vector<string>* from, std::vector<string>* to) {
+static int vecAddTo(vector<string>* from, vector<string>* to) {
   int changesMade = 0;
 
   // for term in termsToAdd

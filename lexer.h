@@ -12,6 +12,7 @@
 #include "inputbuf.h"
 
 // Lexer modified for FIRST & FOLLOW project
+using namespace std;
 
 typedef enum { END_OF_FILE = 0, ARROW, STAR, HASH, ID, ERROR, OR } TokenType;
 
@@ -19,7 +20,7 @@ class Token {
   public:
     void Print();
 
-    std::string lexeme;
+    string lexeme;
     TokenType token_type;
     int line_no;
 };
@@ -31,7 +32,7 @@ class LexicalAnalyzer {
     LexicalAnalyzer();
 
   private:
-    std::vector<Token> tokenList;
+    vector<Token> tokenList;
     Token GetTokenMain();
     int line_no;
     int index;

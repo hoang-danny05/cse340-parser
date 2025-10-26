@@ -12,80 +12,72 @@
 
 ContextFreeGrammar::ContextFreeGrammar() {};
 
-// read grammar
 
+void throwException() {
+  cout << "SYNTAX ERROR !!!!!!!!!!!!!!\n";
+  exit(-1);
+}
 
 void ContextFreeGrammar::readGrammar() {
   LexicalAnalyzer lexer = LexicalAnalyzer();
 
-  int count = 0;
-  const int limit = 1000;
-
-  for (Token peek = lexer.peek(1);
-    (peek.token_type != END_OF_FILE) && (peek.token_type != HASH) && (count <= 50);)
+  // for each start of line 
+  for (Token peek = lexer.peek(1);(peek.token_type == ID);peek = lexer.peek(1))
   {
     if (peek.token_type == ERROR) {
-      std::cout << "SYNTAX ERROR !!!!!!!!!!!!!!\n";
-      std::exit(-1);
+      throwException();
     }
 
     string LHS = lexer.GetToken().lexeme;
-    std::vector<string> RHS = std::vector<string>();
+    vector<string> RHS = vector<string>();
     
     if (lexer.GetToken().token_type != ARROW) {
-      std::cout << "SYNTAX ERROR !!!!!!!!!!!!!!\n";
-      std::exit(-1);
+      throwException();
     }
 
-    for (int i = 0; i < limit; i++) {
-      if (i == limit)
-        std::cout << "[CFG] Exceeded rule length of tokens!!!\n";
+    while (true) {
       
       Token tmp = lexer.GetToken();
 
       if (tmp.token_type == STAR) {
         Rule rule = Rule(LHS, RHS);
         if (DEBUGGING) {
-          std::cout << "\nAdding terminated rule\n";
+          cout << "\nAdding terminated rule\n";
           rule.Print();
         }
         this->rules.push_back(rule);
-        // std::cout << "Size:"<< rules.size()<< std::endl;
+        // cout << "Size:"<< rules.size()<< endl;
         break;
       }
       else if (tmp.token_type == OR) {
         Rule rule = Rule(LHS, RHS);
         if (DEBUGGING) {
-          std::cout << "\nAdding OR rule\n";
+          cout << "\nAdding OR rule\n";
           rule.Print();
         }
         this->rules.push_back(rule);
-        RHS = std::vector<string>();
-        //std::cout << "NEW RHS size:"<< RHS.size()<< std::endl;
+        RHS = vector<string>();
+        //cout << "NEW RHS size:"<< RHS.size()<< endl;
       }
       else {
         RHS.push_back(tmp.lexeme);
       }
     } //end for each OR rule
-    count++;
-
-   peek = lexer.peek(1);
   } // end for each line
 
-  if (DEBUGGING)
-    std::cout << "Final Size:"<< this->rules.size()<< std::endl;
-  if (count == limit) {
-  //  std::cout << "WARNING: CFG rule limit exceeded!\n";
-    std::cout << "SYNTAX ERROR !!!!!!!!!!!!!!\n";
-    std::exit(-1);
+  if (lexer.GetToken().token_type != HASH) {
+    throwException();
   }
+
+  if (DEBUGGING)
+    cout << "Final Size:"<< this->rules.size()<< endl;
 }
 
 void ContextFreeGrammar::Print() {
-  std::cout << "total rules: "<< rules.size() << "  \n";
-  std::cout << "###############################################\n";
-  std::cout << "DISPLAYING CFG: \n";
-  std::cout << "###############################################\n";
+  cout << "total rules: "<< rules.size() << "  \n";
+  cout << "###############################################\n";
+  cout << "DISPLAYING CFG: \n";
+  cout << "###############################################\n";
   for (int i = 0; i < rules.size(); i++) {
     rules.at(i).Print();
   }
@@ -105,7 +97,7 @@ void ContextFreeGrammar::init() {
 /////////////////////////////////////////////////////////////////////////
 
 // checks lexeme, nothing else!
-// bool vecContains(std::vector<string> vec, string item) {
+// bool vecContains(vector<string> vec, string item) {
 //   for(int i = 0; i < vec.size(); i++) {
 //     if (vec.at(i)  == item )
 //       return true;
@@ -117,11 +109,11 @@ void ContextFreeGrammar::initTokens() {
   // must be called AFTER constructor
   
   if ((!terminals.empty()) || (!nonterminals.empty())) {
-    std::cout << "WARNING: initTokens called twice. returning\n";
+    cout << "WARNING: initTokens called twice. returning\n";
     return;
   }
 
-  std::vector<string> nonterm_set;
+  vector<string> nonterm_set;
 
   //nonterminals
   for (int i = 0; i < rules.size(); i++) {
@@ -171,14 +163,14 @@ void ContextFreeGrammar::initTokens() {
   }
 }
 
-void ContextFreeGrammar::Printstrings() {
+void ContextFreeGrammar::PrintTokens() {
   for (int i = 0; i < terminals.size(); i++) {
-    std::cout << terminals.at(i)  << " ";
+    cout << terminals.at(i)  << " ";
   }
   for (int i = 0; i < nonterminals.size(); i++) {
-    std::cout << nonterminals.at(i)  << " ";
+    cout << nonterminals.at(i)  << " ";
   }
-  std::cout << std::endl;
+  cout << endl;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -191,7 +183,7 @@ void ContextFreeGrammar::initNullable() {
       nullable.push_back(rule.LHS);
     }
     // else {
-    //   std::cout<< rule.LHS  << "is NOT null\n";
+    //   cout<< rule.LHS  << "is NOT null\n";
     // }
   }
 
@@ -229,23 +221,23 @@ void ContextFreeGrammar::initNullable() {
 }
 
 void ContextFreeGrammar::PrintNullable() {
-  std::cout << "Nullable = { ";
+  cout << "Nullable = { ";
   
   int nullCount = 0;
   for (string order : nonterminals) {
     for (string t : nullable ) {
       if (t  == order ) {
-        std::cout << t ;
-        //std::cout << "comp: " << nullCount << " == " << nullable.size() << "\n";
+        cout << t ;
+        //cout << "comp: " << nullCount << " == " << nullable.size() << "\n";
         if (nullCount != nullable.size() -1)
-          std::cout << " , ";
+          cout << " , ";
         nullCount +=1;
         break;
       }
     }
   }
 
-  std::cout << " }\n";
+  cout << " }\n";
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -256,13 +248,13 @@ void ContextFreeGrammar::PrintNullable() {
 
 void ContextFreeGrammar::initFirst() {
   if (DEBUGGING)
-  std::cout << "Initialize map\n";
+  cout << "Initialize map\n";
   for (string nonterm : nonterminals) {
-    first.insert({nonterm , std::vector<string>()});
+    first.insert({nonterm , vector<string>()});
   }
 
   if (DEBUGGING)
-  std::cout << "Initial map terminals\n";
+  cout << "Initial map terminals\n";
   for (Rule rule : rules) {
     // if RHS is not empty AND 
     // if the first character of the RHS terminal AND
@@ -278,7 +270,7 @@ void ContextFreeGrammar::initFirst() {
   }
 
   if (DEBUGGING)
-  std::cout << "Starting complex loop \n";
+  cout << "Starting complex loop \n";
   while (true) {
     int changesMade = 0;
     for (Rule rule : rules) {
@@ -302,7 +294,7 @@ void ContextFreeGrammar::initFirst() {
         )
         {
           if (DEBUGGING)
-            std::cout << "Terminal found: " << r  << "\n";
+            cout << "Terminal found: " << r  << "\n";
 
           if (!vecContains(first.at(rule.LHS ), r)) {
             first.at(rule.LHS ).push_back(r);
@@ -314,23 +306,23 @@ void ContextFreeGrammar::initFirst() {
         {
           //NOTE: adds first[r ] to first[rule.LHS ]
           if (DEBUGGING)
-            std::cout << "Nullable nonterm: " << r  << "\n";
-          std::vector<string>* termsToAdd = &first.at(r );
-          std::vector<string>* termsInSet = &first.at(rule.LHS );
+            cout << "Nullable nonterm: " << r  << "\n";
+          vector<string>* termsToAdd = &first.at(r );
+          vector<string>* termsInSet = &first.at(rule.LHS );
           changesMade += vecAddTo(termsToAdd, termsInSet);
 
           continue;
         }
         else {
           if (DEBUGGING)
-            std::cout << "Non-Nullable nonterm: " << r  << "\n";
+            cout << "Non-Nullable nonterm: " << r  << "\n";
           // for (string t: terminals) {
-          //   std::cout << t  << ", ";
+          //   cout << t  << ", ";
           // }
-          // std::cout << std::endl;
+          // cout << endl;
           //NOTE: adds first[r ] to first[rule.LHS ]
-          std::vector<string>* termsToAdd = &first.at(r );
-          std::vector<string>* termsInSet = &first.at(rule.LHS );
+          vector<string>* termsToAdd = &first.at(r );
+          vector<string>* termsInSet = &first.at(rule.LHS );
           changesMade += vecAddTo(termsToAdd, termsInSet);
           break;
         }
@@ -342,12 +334,12 @@ void ContextFreeGrammar::initFirst() {
 
     if (changesMade == 0) {
       if (DEBUGGING)
-        std::cout<<"Ending FIRST Loops\n";
+        cout<<"Ending FIRST Loops\n";
       break;
     }
     else {
       if (DEBUGGING)
-        std::cout<<"Next FIRST Loop\n";
+        cout<<"Next FIRST Loop\n";
     }
   } // end while
 }
@@ -356,25 +348,25 @@ void ContextFreeGrammar::PrintFirst() {
 
   // for (lhs, terms) in first
   for (string tok : nonterminals){
-    std::string lhs = tok ;
-    std::vector<string> terms = first.at(lhs);
-    std::cout << "FIRST(" << lhs << ") = { ";
+    string lhs = tok ;
+    vector<string> terms = first.at(lhs);
+    cout << "FIRST(" << lhs << ") = { ";
 
     int termCount = 0;
     // in order of terminals
     for(string order : terminals) {
       for(string t : terms) {
         if (t  == order ) {
-          std::cout << t ;
+          cout << t ;
           if (termCount != terms.size() - 1) {
-            std::cout << ", ";
+            cout << ", ";
           }
           termCount++;
           break;
         }
       }
     }
-    std::cout << " }\n";
+    cout << " }\n";
   }
 }
 
@@ -384,9 +376,9 @@ void ContextFreeGrammar::PrintFirst() {
 
 void ContextFreeGrammar::initFollow() {
   if (DEBUGGING)
-  std::cout << "follow: Initialize map\n";
+  cout << "follow: Initialize map\n";
   for (string nonterm : nonterminals) {
-    follow.insert({nonterm , std::vector<string>()});
+    follow.insert({nonterm , vector<string>()});
   }
 
   string eof;
@@ -420,14 +412,14 @@ void ContextFreeGrammar::initFollow() {
       for(int j = i+1; j < rule.RHS.size(); j++) {
         string follower = rule.RHS.at(j);
         if (vecContains(terminals, follower)) {
-          std::vector<string> term = {follower};
-          std::vector<string> *followTarget = &follow.at(base );
+          vector<string> term = {follower};
+          vector<string> *followTarget = &follow.at(base );
           vecAddTo(&term, followTarget);
           break;
         }
         else if (vecContains(nullable, follower)) {
-          std::vector<string> *terms = &first.at(follower );
-          std::vector<string> *followTarget = &follow.at(base );
+          vector<string> *terms = &first.at(follower );
+          vector<string> *followTarget = &follow.at(base );
           if (j == rule.RHS.size()) { // if it is the end
             terms->push_back(eof);
           } 
@@ -435,8 +427,8 @@ void ContextFreeGrammar::initFollow() {
           continue;
         }
         else { // NonNull Nonterm
-          std::vector<string> *terms = &first.at(follower );
-          std::vector<string> *followTarget = &follow.at(base );
+          vector<string> *terms = &first.at(follower );
+          vector<string> *followTarget = &follow.at(base );
           vecAddTo(terms, followTarget);
           break;
         }
@@ -445,7 +437,7 @@ void ContextFreeGrammar::initFollow() {
   }
 
   if (DEBUGGING)
-  std::cout << "Starting complex loop \n";
+  cout << "Starting complex loop \n";
   while (true) {
     int changesMade = 0;
     for (Rule rule : rules) {
@@ -505,8 +497,8 @@ void ContextFreeGrammar::initFollow() {
       //      remove termsToAdd
       //      continue
 
-      std::vector<string> *inherit = &follow.at(rule.LHS );
-      std::vector<string> termsToAdd;
+      vector<string> *inherit = &follow.at(rule.LHS );
+      vector<string> termsToAdd;
       // add follow(LHS)
       vecAddTo(inherit, &termsToAdd);
 
@@ -520,25 +512,25 @@ void ContextFreeGrammar::initFollow() {
         }
         else if (vecContains(nullable, current)) {
           // add to follow(current)
-          std::vector<string> *target = &follow.at(current );
+          vector<string> *target = &follow.at(current );
           changesMade += vecAddTo(&termsToAdd, target);
           
           // add first(me) to collection
-          std::vector<string> *newTarget = &first.at(current );
+          vector<string> *newTarget = &first.at(current );
           vecAddTo(newTarget, &termsToAdd);
 
           continue;
         }
         else { // nonterm nullable
           // add to follow(current)
-          std::vector<string> *target = &follow.at(current );
+          vector<string> *target = &follow.at(current );
           changesMade += vecAddTo(&termsToAdd, target);
 
           // because not nullable
           termsToAdd.clear();
 
           // add first(me) to collection
-          std::vector<string> *newTarget = &first.at(current );
+          vector<string> *newTarget = &first.at(current );
           vecAddTo(newTarget, &termsToAdd);
 
           continue;
@@ -549,12 +541,12 @@ void ContextFreeGrammar::initFollow() {
 
     if (changesMade == 0) {
       if (DEBUGGING)
-        std::cout<<"Ending FOLLOW Loops\n";
+        cout<<"Ending FOLLOW Loops\n";
       break;
     }
     else {
       if (DEBUGGING)
-        std::cout<<"Next FOLLOW Loop\n";
+        cout<<"Next FOLLOW Loop\n";
     }
   } // end while
 
@@ -563,32 +555,32 @@ void ContextFreeGrammar::initFollow() {
 void ContextFreeGrammar::PrintFollow() {
   string eof;
   eof  = "$";
-  std::vector<string> termOrder = { eof };
+  vector<string> termOrder = { eof };
   for (string tok : terminals) {
     termOrder.push_back(tok);
   }
 
   // for (lhs, terms) in first
   for (string tok : nonterminals){
-    std::string lhs = tok ;
-    std::vector<string> terms = follow.at(lhs);
-    std::cout << "FOLLOW(" << lhs << ") = { ";
+    string lhs = tok ;
+    vector<string> terms = follow.at(lhs);
+    cout << "FOLLOW(" << lhs << ") = { ";
 
     int termCount = 0;
     // in order of terminals
     for(string order : termOrder) {
       for(string t : terms) {
         if (t  == order ) {
-          std::cout << t ;
+          cout << t ;
           if (termCount != terms.size() - 1) {
-            std::cout << ", ";
+            cout << ", ";
           }
           termCount++;
           break;
         }
       }
     }
-    std::cout << " }\n";
+    cout << " }\n";
   }
 }
 
@@ -601,7 +593,7 @@ void ContextFreeGrammar::PrintFollow() {
 /////////////////////////////////////////////////////////////////////////
 
 
-Rule::Rule(string lhs, std::vector<string> rhs) {
+Rule::Rule(string lhs, vector<string> rhs) {
   LHS = lhs;
   RHS = rhs;
 }
@@ -611,26 +603,26 @@ Rule::Rule() {
 
 
 // void Rule::Print() {
-//   std::cout << "\tRULE: " << LHS  << " --> ";
+//   cout << "\tRULE: " << LHS  << " --> ";
 //   for(int i = 0; i < RHS.size(); i++) {
-//     std::cout << RHS.at(i)  << " ";
+//     cout << RHS.at(i)  << " ";
 //   }
-//   std::cout << "\n\n";
+//   cout << "\n\n";
 // }
 
 void Rule::Print() {
-  std::cout << LHS  << " -> ";
+  cout << LHS  << " -> ";
   for(int i = 0; i < RHS.size(); i++) {
-    std::cout << RHS.at(i)  << " ";
+    cout << RHS.at(i)  << " ";
   }
-  std::cout << "#\n";
+  cout << "#\n";
 }
 
 bool Rule::isNull() {
   return RHS.empty();
 }
 
-bool Rule::hasPrefix(std::vector<string> prefix){
+bool Rule::hasPrefix(vector<string> prefix){
   if(RHS.size() < prefix.size()) {
     return false;
   }

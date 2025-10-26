@@ -1,5 +1,0 @@
-DONE
-A -> b B c B #
-B -> d A #
-S -> a A #
-S -> z B #
