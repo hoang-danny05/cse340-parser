@@ -76,4 +76,8 @@ echo
 echo "Passed $count tests out of $all for task ${taskNumber}"
 echo
 
-rmdir ./output
+if [ $count -ne 12 ]; then 
+    exit 1;
+fi
+
+rm -rf ./output

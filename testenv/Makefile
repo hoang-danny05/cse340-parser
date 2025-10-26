@@ -1,5 +1,5 @@
 it: 
-	g++ project2.cc lexer.cc inputbuf.cc 
+	g++ project2.cc lexer.cc inputbuf.cc CFG.cc
 
 test1:
 	make it 
@@ -22,7 +22,7 @@ test4:
 	rm ./a.out
 
 test5:
-	rm ./a.out*
+	rm -f ./a.out*
 	make it 
 	./a.out < tests/test12.txt 5
 
@@ -34,7 +34,12 @@ test6:
 
 fulltest:
 	make it 
-	bash test_01.sh	
+	bash test_p2.sh 1 && \
+	bash test_p2.sh 2 && \
+	bash test_p2.sh 3 && \
+	bash test_p2.sh 4 && \
+	bash test_p2.sh 5 && \
+	bash test_p2.sh 6
 
 finaltest:
 	make it 
